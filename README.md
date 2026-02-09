@@ -50,3 +50,71 @@ Transit planets are shown in cyan color with `T-` prefix.
 
 The tool expects JSON in this structure:
 
+
+
+{
+"ayanamshas": {
+"Lahiri": {
+"lagna": 123.45,
+"cusps": {
+"1": 123.45,
+"2": 153.45
+},
+"planets": {
+"Surya": 210.5,
+"Chandra": 15.3
+},
+"planets_retro": {
+"Saturn": true
+}
+}
+}
+}
+
+
+All degrees must be in **0–360 format**.
+
+---
+
+## How to Use
+
+### Step 1 — Download
+Download the HTML file.
+
+### Step 2 — Open
+Open the file in any modern browser:
+- Chrome
+- Edge
+- Firefox
+
+### Step 3 — Load Charts
+1. Click **LOAD NATAL JSON**
+2. Select natal chart JSON
+3. Click **LOAD TRANSIT JSON**
+4. Select transit chart JSON
+
+---
+
+## Controls
+
+| Control | Function |
+|--------|----------|
+| Hide Minor | Hides Sun, Moon, Mars, Mercury, Venus from transit |
+| Hide Cusps | Hides house cusps |
+| Pivot | Sets chart reference (ASC or planet) |
+| House Start | Rotates house numbering |
+
+---
+
+## Requirements
+
+- Any modern web browser
+- No installation required
+- Works fully offline
+
+---
+
+## Project Structure
+
+
+
