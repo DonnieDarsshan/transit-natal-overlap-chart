@@ -3,6 +3,7 @@ Transit Mixer is a simple, fast, browser-based Vedic astrology tool that overlay
 
 
 LIVE LINK
+https://donniedarsshan.github.io/transit-natal-overlap-chart/
 
 
 # Transit Mixer
