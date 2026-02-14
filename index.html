@@ -18,12 +18,20 @@ body{
     margin:0;
     padding:20px;
 }
+
+
+
 .controls{
     display:flex;
     gap:15px;
     justify-content:center;
-    margin-bottom:25px;
+    margin-bottom:60px; /* increase space above kundali */
 }
+
+
+
+
+
 button{
     padding:10px 20px;
     background:var(--grid-line);
@@ -32,41 +40,143 @@ button{
     font-weight:bold;
     cursor:pointer;
 }
-.kundali{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    grid-template-rows:repeat(4,1fr);
-    width:650px;
-    height:650px;
-    margin:0 auto;
-    border:2px solid var(--grid-line);
+
+
+
+
+
+
+
+
+
+
+
+
+
+.kundali {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+
+    /* FIX: force perfectly equal rows even with spanning center box */
+    grid-template-rows: repeat(4, calc(650px / 4));
+
+    width: 850px;
+    height: 650px;
+    min-height: 650px;
+
+
+    margin: 0 auto;
+
+    /* GRID LINES */
+    gap: 2px;
+    background: var(--grid-line);
+
+    /* FIX: Use a solid border instead of box-shadow for the outer frame */
+    border: 2px solid var(--grid-line);
+    
+    /* Ensure padding and border are included in the 650px width */
+    box-sizing: border-box;
+    
+    /* Prevents sub-pixel rendering issues from hiding the right edge */
+    overflow: hidden; 
 }
+
+
+
+
+
+
+
+
+
+
 .house{
-    border:1px solid var(--grid-line);
+    border:none;
+    background:#2b0000;
+
     position:relative;
     display:flex;
     flex-direction:column;
-    justify-content:center;
+    justify-content:flex-start;
     align-items:center;
+
+    padding-top:36px;
+    padding-left:8px;
+    padding-right:60px;
+    padding-bottom:8px;
+
+    box-sizing:border-box;
+
+    /* ⭐ KEY FIX — content stays inside cell */
+    overflow-y:auto;
+    overflow-x:hidden;
 }
+
+
+
+
+
+
+
+
+
+
 .house-num{
     position:absolute;
-    top:4px;
-    left:6px;
+    top:6px;
+    left:8px;
     color:var(--asc-yellow);
     font-weight:bold;
-    font-size:18px;
+    font-size:24px;
+    line-height:1;
 }
+
+.sav-box{
+    position:absolute;
+    top:6px;
+    right:8px;
+    background:#000;
+    color:#fff;
+    padding:4px 8px;
+    font-size:24px;
+    font-weight:bold;
+    line-height:1;
+    border-radius:6px;
+}
+
+
+
+
+
+
+
+
 .cusp-line{
     font-size:13px;
     color:#ffcc00;
     margin-bottom:4px;
+    white-space:nowrap;     /* PREVENT LINE BREAK */
 }
+
 .p-line{
     font-size:18px;
     margin:2px 0;
     font-weight:bold;
+    white-space:nowrap;     /* PREVENT LINE BREAK */
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 .asc-line{
     color:var(--asc-yellow);
     font-weight:bold;
@@ -134,11 +244,7 @@ button{
     <button onclick="document.getElementById('transitFile').click()">LOAD TRANSIT JSON</button>
 	
 	
-	<label style="display:flex;align-items:center;gap:6px;font-weight:bold;">
-<input type="checkbox" id="hideMinor" checked>
 
-Hide Minor
-</label>
 
 
 
@@ -146,6 +252,18 @@ Hide Minor
 <input type="checkbox" id="hideCusps">
 Hide Cusps
 </label>
+
+<label style="display:flex;align-items:center;gap:6px;font-weight:bold;">
+<input type="checkbox" id="hideMinorTransit">
+Hide Minor
+</label>
+
+<label style="display:flex;align-items:center;gap:6px;font-weight:bold;">
+<input type="checkbox" id="hideRaKeTransit">
+Hide RaKe
+</label>
+
+
 
 
 
@@ -217,12 +335,12 @@ let transit = null;
 
 document.addEventListener("change",e=>{
     if(
-    e.target.id==="hideMinor" ||
     e.target.id==="hideCusps" ||
+    e.target.id==="hideMinorTransit" ||
+    e.target.id==="hideRaKeTransit" ||
     e.target.id==="pivotSelect" ||
     e.target.id==="houseStart"
 ) render();
-
 
 });
 
@@ -230,7 +348,114 @@ document.addEventListener("change",e=>{
 
 
 
+
 const planets = ["Surya","Chandra","Mangala","Budha","Jupiter","Venus","Saturn","Rahu","Ketu"];
+
+
+
+
+
+
+
+
+
+
+
+/* ============================================================
+   PARASHARA BAV RULES - VERIFIED FOR 337 TOTAL POINTS
+   ============================================================ */
+const BAV_RULES = {
+    Surya: { 
+        Surya: [1, 2, 4, 7, 8, 9, 10, 11], Chandra: [3, 6, 10, 11], 
+        Mangala: [1, 2, 4, 7, 8, 9, 10, 11], Budha: [3, 5, 6, 9, 10, 11, 12], 
+        Jupiter: [5, 6, 9, 11], Venus: [6, 7, 12], 
+        Saturn: [1, 2, 4, 7, 8, 9, 10, 11], Lagna: [3, 4, 6, 10, 11, 12] 
+    },
+    Chandra: { 
+        Surya: [3, 6, 7, 8, 10, 11], Chandra: [1, 3, 6, 7, 10, 11], 
+        Mangala: [2, 3, 5, 6, 9, 10, 11], Budha: [1, 3, 4, 5, 7, 8, 10, 11], 
+        Jupiter: [1, 4, 7, 8, 10, 11, 12], Venus: [3, 4, 5, 7, 9, 10, 11], 
+        Saturn: [3, 5, 6, 11], Lagna: [3, 6, 10, 11] 
+    },
+    Mangala: { 
+        Surya: [3, 5, 6, 10, 11], Chandra: [3, 6, 11], 
+        Mangala: [1, 2, 4, 7, 8, 10, 11], Budha: [3, 5, 6, 11], 
+        Jupiter: [6, 10, 11, 12], Venus: [6, 8, 11, 12], 
+        Saturn: [1, 4, 7, 8, 9, 10, 11], Lagna: [1, 3, 6, 10, 11] 
+    },
+    Budha: { 
+        Surya: [5, 6, 9, 11, 12], Chandra: [2, 4, 6, 8, 10, 11], 
+        Mangala: [1, 2, 4, 7, 8, 9, 10, 11], Budha: [1, 3, 5, 6, 9, 10, 11, 12], 
+        Jupiter: [6, 8, 11, 12], Venus: [1, 2, 3, 4, 5, 8, 9, 11], 
+        Saturn: [1, 2, 4, 7, 8, 9, 10, 11], Lagna: [1, 2, 4, 6, 8, 10, 11] 
+    },
+    Jupiter: { 
+        Surya: [1, 2, 3, 4, 7, 8, 9, 10, 11], Chandra: [2, 5, 7, 9, 11], 
+        Mangala: [1, 2, 4, 7, 8, 10, 11], Budha: [1, 2, 4, 5, 6, 9, 10, 11], 
+        Jupiter: [1, 2, 3, 4, 7, 8, 10, 11], Venus: [2, 5, 6, 9, 10, 11], 
+        Saturn: [3, 5, 6, 12], Lagna: [1, 2, 4, 5, 6, 7, 9, 10, 11] 
+    },
+    Venus: { 
+        Surya: [8, 11, 12], Chandra: [1, 2, 3, 4, 5, 8, 9, 11, 12], 
+        Mangala: [3, 5, 6, 9, 11, 12], Budha: [3, 5, 6, 9, 11], 
+        Jupiter: [5, 8, 9, 10, 11], Venus: [1, 2, 3, 4, 5, 8, 9, 10, 11], 
+        Saturn: [3, 4, 5, 8, 9, 10, 11], Lagna: [1, 2, 3, 4, 5, 8, 9, 11] 
+    },
+    Saturn: { 
+        Surya: [1, 2, 4, 7, 8, 10, 11], Chandra: [3, 6, 11], 
+        Mangala: [3, 5, 6, 10, 11, 12], Budha: [6, 8, 9, 10, 11, 12], 
+        Jupiter: [5, 6, 11, 12], Venus: [6, 11, 12], 
+        Saturn: [3, 5, 6, 11], Lagna: [1, 3, 4, 6, 10, 11] 
+    }
+};
+
+function calcSAV(nData) {
+    const planets7 = ["Surya", "Chandra", "Mangala", "Budha", "Jupiter", "Venus", "Saturn"];
+    const posSign = {};
+    
+    // Calculate 0-11 index for each planet
+    planets7.forEach(p => posSign[p] = Math.floor(nData.planets[p] / 30));
+    posSign["Lagna"] = Math.floor(nData.lagna / 30);
+
+    const SAV = Array(12).fill(0);
+
+    planets7.forEach(targetPlanet => {
+        const contributors = [...planets7, "Lagna"];
+        contributors.forEach(source => {
+            const rules = BAV_RULES[targetPlanet][source];
+            const sourceSign = posSign[source];
+
+            if (rules) {
+                rules.forEach(houseOffset => {
+                    // Standard: Sign = (Source_Sign + House_Offset - 1) % 12
+                    const targetZodiacSign = (sourceSign + (houseOffset - 1)) % 12;
+                    SAV[targetZodiacSign]++;
+                });
+            }
+        });
+    });
+
+    // Final verification: Sum of SAV must be 337
+    const totalPoints = SAV.reduce((a, b) => a + b, 0);
+    console.log("Total SAV Points:", totalPoints); 
+    
+    return SAV;
+}
+	
+	
+	
+	
+	
+	
+
+
+
+
+
+
+
+
+
 
 document.getElementById("natalFile").onchange = e=>{
     const r = new FileReader();
@@ -264,40 +489,45 @@ function render(){
 
 
 
+if(!natal){
 
-		if(!natal){
-		const map=[11,0,1,2,10,-1,-1,3,9,-1,-1,4,8,7,6,5];
-		map.forEach(idx=>{
-			const h=document.createElement("div");
-			h.className="house";
+        const map=[11,0,1,2,10,-1,-1,3,9,-1,-1,4,8,7,6,5];
 
-			if(idx===-1){
-				if(!k.querySelector(".center-box")){
-					const cb=document.createElement("div");
-					cb.className="center-box";
-					cb.innerText="Transit Mixer";
-					k.appendChild(cb);
-				}
-			}else{
-				h.innerHTML+=`<div class="house-num">${idx+1}</div>`;
-				h.innerHTML+=`<div class="cusp-line">Load Natal JSON</div>`;
-				k.appendChild(h);
-			}
-		});
-		return;
-	}
+        map.forEach((idx, mapIndex)=>{
+            const h=document.createElement("div");
+            h.className="house";
 
+            if(idx===-1){
+                if(!k.querySelector(".center-box")){
+                    const cb=document.createElement("div");
+                    cb.className="center-box";
+                    cb.innerText="Transit Mixer";
+                    k.appendChild(cb);
+                }
+            }else{
+                h.innerHTML+=`<div class="house-num">${idx+1}</div>`;
+                h.innerHTML+=`<div class="cusp-line">Load Natal JSON</div>`;
+                k.appendChild(h);
+            }
+        });
 
-
-
-
+        /* ===== DEFAULT ROW HEIGHTS WHEN EMPTY ===== */
+        
+        return;
+}
 
 
-    const nData = natal.ayanamshas["Lahiri"];
-    const tData = transit ? transit.ayanamshas["Lahiri"] : null;
+/* ===== LOAD NATAL + TRANSIT DATA ===== */
+const nData = natal.ayanamshas["Lahiri"];
+const tData = transit ? transit.ayanamshas["Lahiri"] : null;
+
+
+
+
 
     const ascSign = Math.floor(nData.lagna/30);
-	
+	let SAV = calcSAV(nData);
+
 	const pivot = document.getElementById("pivotSelect")?.value || "ASC";
 
 	let pivotDeg = nData.lagna;
@@ -306,25 +536,59 @@ function render(){
 		pivotDeg = nData.planets[pivot];
 	}
 
-	const pivotSign = Math.floor(pivotDeg/30);
+	/* ==========================================================
+	   ROTATE SAV IF PIVOT IS 15°00′–29°59′ (HALF SIGN SHIFT)
+	   ========================================================== */
+	const pivotLocalDeg = pivotDeg % 30;
+
+	if(pivotLocalDeg >= 15){
+		const rotated = Array(12);
+		for(let i=0;i<12;i++){
+			rotated[(i+1)%12] = SAV[i]; // shift to next sign cyclically
+		}
+		SAV = rotated;
+	}
+
+	
+	
+	
+	
+	
+	
+
+	const pivotSign = Math.floor(pivotDeg/30); // zodiac reference stays fixed
+
+	/* ==========================================================
+	   HOUSE NUMBERING HALF-SIGN SHIFT (ONLY NUMBERING)
+	   ========================================================== */
+	let houseNumberingOffset = 0;
+	if((pivotDeg % 30) >= 15){
+		houseNumberingOffset = 1; // next sign becomes house 1
+	}
+
 	const houseStart = parseInt(document.getElementById("houseStart")?.value || "1");
+
+
+
+
+
+
+
 
 
 
 
     let chart = Array(12).fill().map(()=>[]);
 
-    // natal asc
-    // ASC handled with cusp display
-
-    // natal planets
-    planets.forEach(p=>{
+/* ==========================================================
+   NATAL PLANETS (always shown)
+   ========================================================== */
+planets.forEach(p=>{
     const deg = nData.planets[p];
     const s = Math.floor(deg/30);
 
-   const isRetro = nData.planets_retro && nData.planets_retro[p];
-const rMark = isRetro ? " (R)" : "";
-
+    const isRetro = nData.planets_retro && nData.planets_retro[p];
+    const rMark = isRetro ? " (R)" : "";
 
     chart[s].push({
         text:p.substring(0,2)+" "+degToText(deg)+rMark,
@@ -332,67 +596,100 @@ const rMark = isRetro ? " (R)" : "";
     });
 });
 
+/* ==========================================================
+   TRANSIT PLANETS (with hide filters)
+   ========================================================== */
+   if(tData){
 
-    // transit planets
-    if(tData){
-	
-	const hideMinor = document.getElementById("hideMinor")?.checked;
-	const minorPlanets = ["Surya","Chandra","Mangala","Budha","Venus"];
+    const hideMinor = document.getElementById("hideMinorTransit")?.checked;
+    const hideRaKe = document.getElementById("hideRaKeTransit")?.checked;
+
+    const minorTransitSet = ["Surya","Chandra","Mangala","Venus","Budha"];
+    const rakeSet = ["Rahu","Ketu"];
+
+    planets.forEach(p=>{
+
+        if(hideMinor && minorTransitSet.includes(p)) return;
+        if(hideRaKe && rakeSet.includes(p)) return;
+
+        const deg = tData.planets[p];
+        const s = Math.floor(deg/30);
+
+        const isRetro = tData.planets_retro && tData.planets_retro[p];
+        const rMark = isRetro ? " (R)" : "";
+
+        chart[s].push({
+            text:"T-"+p.substring(0,2)+" "+degToText(deg)+rMark,
+            cls:"transit-line"
+        });
+    });
+}
 
 
-        planets.forEach(p=>{
-		if(hideMinor && minorPlanets.includes(p)) return;
-
-		const deg = tData.planets[p];
-		const s = Math.floor(deg/30);
-
-		const isRetro = tData.planets_retro && tData.planets_retro[p];
-		const rMark = isRetro ? " (R)" : "";
+/* ===== ROW HEIGHT TRACKER (REQUIRED FOR DYNAMIC GRID) ===== */
+let rowMaxItems = [1,1,1,1];
+let cellIndex = 0;
 
 
-		chart[s].push({
-			text:"T-"+p.substring(0,2)+" "+degToText(deg)+rMark,
-			cls:"transit-line"
-		});
-	});
+const map=[11,0,1,2,10,-1,-1,3,9,-1,-1,4,8,7,6,5];
 
+map.forEach((idx, mapIndex)=>{
+    const h=document.createElement("div");
+    h.className="house";
 
-    }
-
-    const map=[11,0,1,2,10,-1,-1,3,9,-1,-1,4,8,7,6,5];
-
-    map.forEach(idx=>{
-        const h=document.createElement("div");
-        h.className="house";
-
-        if(idx===-1){
+    if(idx===-1){
 		h.className="house center-box";
 		h.innerText="Transit Mixer";
 		k.appendChild(h);
 	}else{
 
+            
+			
+			
+			
+			
+			/* ==========================================================
+		   ORIGINAL HOUSE NUMBER (FOR CUSP + ASC ONLY — NEVER SHIFT)
+		   ========================================================== */
+		let cuspHouseNum=((idx-pivotSign+12)%12)+1;
+		cuspHouseNum=((cuspHouseNum-houseStart+12)%12)+1;
 
-            let houseNum=((idx-pivotSign+12)%12)+1;
+		/* ==========================================================
+		   DISPLAY HOUSE NUMBER (SHIFTED WHEN ≥15°)
+		   ========================================================== */
+		let displayHouseNum=((idx - (pivotSign + houseNumberingOffset) + 12)%12)+1;
+		displayHouseNum=((displayHouseNum-houseStart+12)%12)+1;
 
-			// rotate house numbering
-			houseNum=((houseNum-houseStart+12)%12)+1;
+		h.innerHTML+=`<div class="house-num">${displayHouseNum}</div>`;
+		h.innerHTML+=`<div class="sav-box">${SAV[idx]}</div>`;
 
-            h.innerHTML+=`<div class="house-num">${houseNum}</div>`;
+
+
 
             
 
             let items = [];
+			const contentBox = document.createElement("div");
+			contentBox.style.display = "flex";
+			contentBox.style.flexDirection = "column";
+			contentBox.style.alignItems = "flex-start";
+
 
 			// add cusp + ASC
 		const hideCusps = document.getElementById("hideCusps")?.checked;
 		let cuspDeg;
 
+
+
+
+
+
 		if(pivot==="ASC"){
-		const realCuspIndex = ((houseNum + houseStart - 2) % 12) + 1;
+		const realCuspIndex = ((cuspHouseNum + houseStart - 2) % 12) + 1;
 		cuspDeg = nData.cusps[realCuspIndex];
-	}else{
-		cuspDeg = (pivotDeg + (houseNum-1)*30) % 360;
-	}
+		}else{
+		cuspDeg = (pivotDeg + (cuspHouseNum-1)*30) % 360;
+		}
 
 
 
@@ -401,7 +698,7 @@ const rMark = isRetro ? " (R)" : "";
 
 
 		// ASC must follow rotated house start
-		if(houseNum===1){
+		if(cuspHouseNum===1){
 			items.push({
 				text: "ASC "+degToText(cuspDeg),
 				deg: cuspLocal,
@@ -410,13 +707,13 @@ const rMark = isRetro ? " (R)" : "";
 		}
 
 
-		if(!hideCusps && houseNum!==1){
+		if(!hideCusps && cuspHouseNum!==1){
 		items.push({
-			text: "Cusp "+houseNum+": "+degToText(cuspDeg),
+			text: "Cusp "+cuspHouseNum+": "+degToText(cuspDeg),
 			deg: cuspLocal,
 			cls: "cusp-line"
 		});
-	}
+		}
 
 
 
@@ -446,24 +743,142 @@ const rMark = isRetro ? " (R)" : "";
 			}else{
 				items.sort((a,b)=>b.deg-a.deg); // Libra–Pisces descending
 			}
+			
+			
+			
+			/* measure row density */
+			const row = Math.floor(mapIndex / 4);
+			rowMaxItems[row] = Math.max(rowMaxItems[row], items.length);
+
 
 			// render
 			items.forEach(it=>{
-				h.innerHTML+=`<div class="p-line ${it.cls}">${it.text}</div>`;
-			});
+			const d = document.createElement("div");
+			d.className = "p-line " + it.cls;
+			d.textContent = it.text;
+			contentBox.appendChild(d);
+		});
+
+		h.appendChild(contentBox);
 
 
 
 
 
 
-            k.appendChild(h);
-        }
+                        k.appendChild(h);
+            cellIndex++;
+
+         }
     });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	/* ==========================================================
+	   CONTENT-BASED ROW HEIGHT (SMART BALANCED)
+	   ========================================================== */
+
+	const TOTAL_HEIGHT = 650;
+	const MIN_ROW = 95;          // minimum readable row
+	const EXTRA_GAP = 18;        // 1 empty breathing line
+	const HEADER_SPACE = 36;     // top header padding in house
+	const LINE_HEIGHT = 22;      // approx height per text line
+
+	/* ----------------------------------------------------------
+	   1. calculate REAL required height for each row
+	---------------------------------------------------------- */
+
+	let required = rowMaxItems.map(items=>{
+		const contentHeight =
+			HEADER_SPACE +
+			(items * LINE_HEIGHT) +
+			EXTRA_GAP;
+		return Math.max(contentHeight, MIN_ROW);
+	});
+
+	/* ----------------------------------------------------------
+	   2. sum total required
+	---------------------------------------------------------- */
+
+	let totalRequired = required.reduce((a,b)=>a+b,0);
+
+
+
+
+
+
+	/* ----------------------------------------------------------
+	   3A. if extra free space → distribute evenly
+	---------------------------------------------------------- */
+
+	if(totalRequired < TOTAL_HEIGHT){
+
+		const spare = TOTAL_HEIGHT - totalRequired;
+		const addPerRow = spare / 4;
+
+		required = required.map(h=>h + addPerRow);
+	}
+
+
+
+
+
+
+
+	/* ----------------------------------------------------------
+	   3B. if overflow → compress proportionally (safe)
+	---------------------------------------------------------- */
+
+	else if(totalRequired > TOTAL_HEIGHT){
+
+		const overflow = totalRequired - TOTAL_HEIGHT;
+
+		const shrinkable = required.map(h=>h - MIN_ROW);
+		const totalShrinkable = shrinkable.reduce((a,b)=>a+b,0);
+
+		if(totalShrinkable > 0){
+			required = required.map((h,i)=>{
+				const share = (shrinkable[i]/totalShrinkable) * overflow;
+				return h - share;
+			});
+		}
+	}
+
+	/* ----------------------------------------------------------
+	   4. apply final heights
+	---------------------------------------------------------- */
+
+	k.style.gridTemplateRows =
+		required.map(h=>h+"px").join(" ");
+
+	
+	
+	
+	
+	
+	
 }
 
 
 render();
+
 
 </script>
 </body>
