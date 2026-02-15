@@ -187,9 +187,10 @@ button{
 
 
 
-
-/* Dark theme for pivot dropdown */
-#pivotSelect{
+/* Dark theme for dropdowns */
+#pivotSelect,
+#houseStart,
+#savMode{
     background:#000;
     color:var(--text-white);
     border:1px solid var(--grid-line);
@@ -197,20 +198,9 @@ button{
     font-weight:bold;
 }
 
-#pivotSelect option{
-    background:#000;
-    color:var(--text-white);
-}
-
-#houseStart{
-    background:#000;
-    color:var(--text-white);
-    border:1px solid var(--grid-line);
-    padding:4px 8px;
-    font-weight:bold;
-}
-
-#houseStart option{
+#pivotSelect option,
+#houseStart option,
+#savMode option{
     background:#000;
     color:var(--text-white);
 }
@@ -236,7 +226,9 @@ button{
 </head>
 <body>
 
-<div class="controls">
+<div class="controls" style="flex-direction:column;gap:10px;align-items:center;">
+    <div style="display:flex;gap:15px;flex-wrap:wrap;justify-content:center;">
+
     <input type="file" id="natalFile" accept=".json" style="display:none">
     <button onclick="document.getElementById('natalFile').click()">LOAD NATAL JSON</button>
 
@@ -268,28 +260,36 @@ Hide RaKe
 
 
 
+
+
+
 <label style="display:flex;align-items:center;gap:6px;font-weight:bold;">
 PIVOT
 <select id="pivotSelect">
 <option value="ASC">ASC</option>
-<option>Chandra</option>
-<option>Mangala</option>
-<option>Rahu</option>
-<option>Jupiter</option>
-<option>Saturn</option>
-<option>Budha</option>
-<option>Ketu</option>
-<option>Venus</option>
-<option>Surya</option>
-<option>Chandra</option>
-<option>Mangala</option>
-<option>Rahu</option>
-<option>Jupiter</option>
-<option>Saturn</option>
-<option>Budha</option>
-<option>Ketu</option>
-<option>Venus</option>
-<option>Surya</option>
+
+<option value="Surya">Surya</option>
+<option value="Chandra">Chandra</option>
+<option value="Mangala">Mangala</option>
+<option value="Budha">Budha</option>
+<option value="Jupiter">Jupiter</option>
+<option value="Venus">Venus</option>
+<option value="Saturn">Saturn</option>
+<option value="Rahu">Rahu</option>
+<option value="Ketu">Ketu</option>
+
+<option value="C1">Cusp 1</option>
+<option value="C2">Cusp 2</option>
+<option value="C3">Cusp 3</option>
+<option value="C4">Cusp 4</option>
+<option value="C5">Cusp 5</option>
+<option value="C6">Cusp 6</option>
+<option value="C7">Cusp 7</option>
+<option value="C8">Cusp 8</option>
+<option value="C9">Cusp 9</option>
+<option value="C10">Cusp 10</option>
+<option value="C11">Cusp 11</option>
+<option value="C12">Cusp 12</option>
 </select>
 </label>
 
@@ -324,9 +324,52 @@ HOUSE START
 
 
 
+    </div>
+
+
+
+
+    <div style="display:flex;gap:20px;justify-content:center;align-items:center;flex-wrap:wrap;">
+    <label style="display:flex;align-items:center;gap:6px;font-weight:bold;">
+        <input type="checkbox" id="includeRahuSAV">
+        Rahu SAV
+    </label>
+
+    <label style="display:flex;align-items:center;gap:6px;font-weight:bold;">
+        <input type="checkbox" id="revertASC">
+        Revert ASC
+    </label>
+
+    <label style="display:flex;align-items:center;gap:6px;font-weight:bold;">
+        BAV MODE
+        <select id="savMode">
+            <option value="SAV">SAV</option>
+            <option value="Saturn">Saturn</option>
+            <option value="Jupiter">Jupiter</option>
+            <option value="Lagna">Ascendant</option>
+            <option value="Chandra">Chandra</option>
+            <option value="Rahu">Rahu</option>
+            <option value="Budha">Budha</option>
+            <option value="Venus">Venus</option>
+            <option value="Surya">Surya</option>
+            <option value="Mangala">Mangala</option>
+        </select>
+    </label>
 </div>
 
+	
+	
+	
+	
+</div>
+
+
+
+
+
 <div id="chart" class="kundali"></div>
+<div id="savTable" style="width:850px;margin:40px auto 0 auto;"></div>
+
 
 <script>
 let natal = null;
@@ -338,11 +381,16 @@ document.addEventListener("change",e=>{
     e.target.id==="hideCusps" ||
     e.target.id==="hideMinorTransit" ||
     e.target.id==="hideRaKeTransit" ||
-    e.target.id==="pivotSelect" ||
-    e.target.id==="houseStart"
+    e.target.id==="includeRahuSAV" ||
+	e.target.id==="revertASC" ||
+	e.target.id==="savMode" ||
+	e.target.id==="pivotSelect" ||
+	e.target.id==="houseStart"
+
 ) render();
 
 });
+
 
 
 
@@ -372,10 +420,10 @@ const BAV_RULES = {
         Saturn: [1, 2, 4, 7, 8, 9, 10, 11], Lagna: [3, 4, 6, 10, 11, 12] 
     },
     Chandra: { 
-        Surya: [3, 6, 7, 8, 10, 11], Chandra: [1, 3, 6, 7, 10, 11], 
-        Mangala: [2, 3, 5, 6, 9, 10, 11], Budha: [1, 3, 4, 5, 7, 8, 10, 11], 
-        Jupiter: [1, 4, 7, 8, 10, 11, 12], Venus: [3, 4, 5, 7, 9, 10, 11], 
-        Saturn: [3, 5, 6, 11], Lagna: [3, 6, 10, 11] 
+			Surya: [3, 6, 7, 8, 10, 11], Chandra: [1, 3, 6, 7, 10, 11], 
+			Mangala: [2, 3, 5, 6, 9, 10, 11], Budha: [1, 3, 4, 5, 7, 8, 10, 11], 
+			Jupiter: [1, 4, 7, 8, 10, 11, 12], Venus: [3, 4, 5, 7, 9, 10, 11], 
+			Saturn: [3, 5, 6, 11], Lagna: [3, 6, 10, 11, 12] 
     },
     Mangala: { 
         Surya: [3, 5, 6, 10, 11], Chandra: [3, 6, 11], 
@@ -397,28 +445,44 @@ const BAV_RULES = {
     },
     Venus: { 
         Surya: [8, 11, 12], Chandra: [1, 2, 3, 4, 5, 8, 9, 11, 12], 
-        Mangala: [3, 5, 6, 9, 11, 12], Budha: [3, 5, 6, 9, 11], 
-        Jupiter: [5, 8, 9, 10, 11], Venus: [1, 2, 3, 4, 5, 8, 9, 10, 11], 
-        Saturn: [3, 4, 5, 8, 9, 10, 11], Lagna: [1, 2, 3, 4, 5, 8, 9, 11] 
+		Mangala: [3, 5, 6, 9, 11, 12], Budha: [3, 5, 6, 9, 11], 
+		Jupiter: [5, 8, 9, 10, 11], Venus: [1, 2, 3, 4, 5, 8, 9, 10, 11], 
+		Saturn: [3, 4, 5, 8, 9, 10, 11], Lagna: [1, 2, 3, 4, 5, 8, 9] 
     },
     Saturn: { 
         Surya: [1, 2, 4, 7, 8, 10, 11], Chandra: [3, 6, 11], 
         Mangala: [3, 5, 6, 10, 11, 12], Budha: [6, 8, 9, 10, 11, 12], 
         Jupiter: [5, 6, 11, 12], Venus: [6, 11, 12], 
         Saturn: [3, 5, 6, 11], Lagna: [1, 3, 4, 6, 10, 11] 
+    },
+    Rahu: {
+        Surya: [1,2,3,5,7,8,10],
+        Chandra: [1,3,5,7,8,9,10],
+        Mangala: [2,3,5,12],
+        Budha: [2,4,7,8,12],
+        Jupiter: [1,3,4,6,8],
+        Venus: [6,7,11,12],
+        Saturn: [3,5,7,10,11,12],
+        Lagna: [3,4,5,9,12]
     }
+
+	
+	
+	
 };
 
-function calcSAV(nData) {
+
+function calcSAV(nData, includeRahu=false) {
+
     const planets7 = ["Surya", "Chandra", "Mangala", "Budha", "Jupiter", "Venus", "Saturn"];
     const posSign = {};
     
-    // Calculate 0-11 index for each planet
     planets7.forEach(p => posSign[p] = Math.floor(nData.planets[p] / 30));
     posSign["Lagna"] = Math.floor(nData.lagna / 30);
 
     const SAV = Array(12).fill(0);
 
+    // classical 7 planet SAV
     planets7.forEach(targetPlanet => {
         const contributors = [...planets7, "Lagna"];
         contributors.forEach(source => {
@@ -427,7 +491,6 @@ function calcSAV(nData) {
 
             if (rules) {
                 rules.forEach(houseOffset => {
-                    // Standard: Sign = (Source_Sign + House_Offset - 1) % 12
                     const targetZodiacSign = (sourceSign + (houseOffset - 1)) % 12;
                     SAV[targetZodiacSign]++;
                 });
@@ -435,15 +498,99 @@ function calcSAV(nData) {
         });
     });
 
-    // Final verification: Sum of SAV must be 337
-    const totalPoints = SAV.reduce((a, b) => a + b, 0);
-    console.log("Total SAV Points:", totalPoints); 
-    
+    // optional Rahu contribution
+    if(includeRahu === true){
+        const contributors = [...planets7, "Lagna"];
+        contributors.forEach(source => {
+            const rules = BAV_RULES["Rahu"][source];
+            const sourceSign = posSign[source];
+
+            if(rules){
+                rules.forEach(offset=>{
+                    const z = (sourceSign + (offset-1)) % 12;
+                    SAV[z]++;
+                });
+            }
+        });
+    }
+
     return SAV;
 }
+
 	
 	
 	
+	
+	
+	
+	/* ============================================================
+   SINGLE PLANET BINNA ASHTAKAVARGA
+   ============================================================ */
+
+const LAGNA_BAV_RULES_GLOBAL = {
+    Surya:   [3,4,6,10,11,12],
+    Chandra: [3,6,10,11,12],
+    Mangala: [1,3,6,10,11],
+    Budha:   [1,2,4,6,8,10,11],
+    Jupiter: [1,2,4,5,6,7,9,10,11],
+    Venus:   [1,2,3,4,5,8,9],
+    Saturn:  [1,3,4,6,10,11],
+    Lagna:   [3,6,10,11]
+};
+
+function calcSingleBAV(nData, target){
+
+    const planets7 = ["Surya","Chandra","Mangala","Budha","Jupiter","Venus","Saturn"];
+
+    const posSign = {};
+    planets7.forEach(p=>posSign[p]=Math.floor(nData.planets[p]/30));
+    posSign["Lagna"]=Math.floor(nData.lagna/30);
+
+    const row = Array(12).fill(0);
+
+    // Lagna special rules
+    if(target==="Lagna"){
+        Object.entries(LAGNA_BAV_RULES_GLOBAL).forEach(([source,rules])=>{
+            const sSign = posSign[source];
+            if(sSign===undefined) return;
+            rules.forEach(offset=>{
+                const z=(sSign+(offset-1))%12;
+                row[z]++;
+            });
+        });
+        return row;
+    }
+
+    // Rahu BAV
+    if(target==="Rahu"){
+        [...planets7,"Lagna"].forEach(source=>{
+            const rules = BAV_RULES["Rahu"][source];
+            const sSign = posSign[source];
+            if(rules){
+                rules.forEach(offset=>{
+                    const z=(sSign+(offset-1))%12;
+                    row[z]++;
+                });
+            }
+        });
+        return row;
+    }
+
+    // normal 7 planet BAV
+    [...planets7,"Lagna"].forEach(source=>{
+        const rules = BAV_RULES[target]?.[source];
+        const sSign = posSign[source];
+        if(rules){
+            rules.forEach(offset=>{
+                const z=(sSign+(offset-1))%12;
+                row[z]++;
+            });
+        }
+    });
+
+    return row;
+}
+
 	
 	
 	
@@ -525,29 +672,55 @@ const tData = transit ? transit.ayanamshas["Lahiri"] : null;
 
 
 
-    const ascSign = Math.floor(nData.lagna/30);
-	let SAV = calcSAV(nData);
+		const ascSign = Math.floor(nData.lagna/30);
+		const includeRahu = document.getElementById("includeRahuSAV")?.checked;
+		const mode = document.getElementById("savMode")?.value || "SAV";
 
-	const pivot = document.getElementById("pivotSelect")?.value || "ASC";
+		let SAV;
+		if(mode==="SAV"){
+			SAV = calcSAV(nData, includeRahu);
+		}else{
+			SAV = calcSingleBAV(nData, mode);
+		}
 
+		const pivot = document.getElementById("pivotSelect")?.value || "ASC";
+
+			
+	
+	
 	let pivotDeg = nData.lagna;
 
-	if(pivot!=="ASC" && nData.planets[pivot]!==undefined){
+	if(pivot==="ASC"){
+		pivotDeg = nData.lagna;
+	}
+	else if(pivot.startsWith("C")){
+		const cNum = parseInt(pivot.substring(1));
+		pivotDeg = nData.cusps[cNum];
+	}
+	else if(nData.planets[pivot]!==undefined){
 		pivotDeg = nData.planets[pivot];
 	}
+
+	
+	
+	
+	
 
 	/* ==========================================================
 	   ROTATE SAV IF PIVOT IS 15°00′–29°59′ (HALF SIGN SHIFT)
 	   ========================================================== */
 	const pivotLocalDeg = pivotDeg % 30;
 
-	if(pivotLocalDeg >= 15){
+	const revertASC = document.getElementById("revertASC")?.checked;
+
+	if(pivotLocalDeg >= 15 && !revertASC){
 		const rotated = Array(12);
 		for(let i=0;i<12;i++){
 			rotated[(i+1)%12] = SAV[i]; // shift to next sign cyclically
 		}
 		SAV = rotated;
 	}
+
 
 	
 	
@@ -562,9 +735,12 @@ const tData = transit ? transit.ayanamshas["Lahiri"] : null;
 	   HOUSE NUMBERING HALF-SIGN SHIFT (ONLY NUMBERING)
 	   ========================================================== */
 	let houseNumberingOffset = 0;
-	if((pivotDeg % 30) >= 15){
+
+	if((pivotDeg % 30) >= 15 && !revertASC){
 		houseNumberingOffset = 1; // next sign becomes house 1
 	}
+
+
 
 	const houseStart = parseInt(document.getElementById("houseStart")?.value || "1");
 
@@ -867,6 +1043,10 @@ map.forEach((idx, mapIndex)=>{
 
 	k.style.gridTemplateRows =
 		required.map(h=>h+"px").join(" ");
+		
+	renderSAVTable(nData);
+
+
 
 	
 	
@@ -875,6 +1055,273 @@ map.forEach((idx, mapIndex)=>{
 	
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+function renderSAVTable(nData){
+    const container = document.getElementById("savTable");
+    container.innerHTML = "";
+    if(!nData) return;
+
+    const planets7 = ["Surya","Chandra","Mangala","Budha","Jupiter","Venus","Saturn"];
+
+    const posSign = {};
+    planets7.forEach(p=>posSign[p]=Math.floor(nData.planets[p]/30));
+    posSign["Lagna"]=Math.floor(nData.lagna/30);
+
+    const table = document.createElement("table");
+    table.style.width="100%";
+    table.style.borderCollapse="collapse";
+    table.style.textAlign="center";
+    table.style.fontSize="16px";
+    table.style.background="#111";
+    table.style.color="#fff";
+
+    function td(txt,bold=false){
+        const c=document.createElement("td");
+        c.textContent=txt;
+        c.style.border="1px solid #ffcc00";
+        c.style.padding="6px";
+        if(bold) c.style.fontWeight="bold";
+        return c;
+    }
+
+
+
+
+    // header with sign names
+	const signNames = [
+		"Ars","Tau","Gem","Can","Leo","Vir",
+		"Lib","Scp","Sag","Cap","Aqu","Pis"
+	];
+
+
+
+
+
+
+
+
+	const pivot = document.getElementById("pivotSelect")?.value || "ASC";
+	const revertASC = document.getElementById("revertASC")?.checked;
+
+	// get pivot degree (same logic as chart)
+	
+	
+	let pivotDeg = nData.lagna;
+
+	if(pivot==="ASC"){
+		pivotDeg = nData.lagna;
+	}
+	else if(pivot.startsWith("C")){
+		const cNum = parseInt(pivot.substring(1));
+		pivotDeg = nData.cusps[cNum];
+	}
+	else if(nData.planets[pivot]!==undefined){
+		pivotDeg = nData.planets[pivot];
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	const pivotSign = Math.floor(pivotDeg/30);
+
+	// build base sign order from pivot sign
+	const signOrder=[];
+	for(let i=0;i<12;i++){
+		signOrder.push(((pivotSign+i)%12)+1);
+	}
+
+	// half-sign shift logic (same as chart)
+	let signLabelOffset = 0;
+	if((pivotDeg % 30) >= 15 && !revertASC){
+		signLabelOffset = 1;
+	}
+
+
+
+
+
+
+	// SIGN NAME ROW
+	const trH=document.createElement("tr");
+	trH.appendChild(td("Sign",true));
+	trH.style.background="#1f2937"; // dark blue-gray
+
+	signOrder.forEach(s=>{
+    const shifted = ((s-1+signLabelOffset)%12)+1;
+    const c = td(signNames[shifted-1],true);
+    c.style.color="#00e5ff";
+    trH.appendChild(c);
+});
+
+
+	trH.appendChild(td("",true));
+	table.appendChild(trH);
+
+	// HOUSE NUMBER ROW
+	const trHouse=document.createElement("tr");
+	trHouse.appendChild(td("House",true));
+	trHouse.style.background="#3f1d2e"; // dark maroon
+
+	for(let i=1;i<=12;i++){
+		const c = td(i,true);
+		c.style.color="#ffcc00";
+		trHouse.appendChild(c);
+	}
+
+	trHouse.appendChild(td("",true));
+	table.appendChild(trHouse);
+
+
+
+
+
+
+
+
+    // calculate SAV
+    let SAV = Array(12).fill(0);
+
+    planets7.forEach(target=>{
+        const row = Array(12).fill(0);
+
+        [...planets7,"Lagna"].forEach(source=>{
+            const rules = BAV_RULES[target][source];
+            if(!rules) return;
+
+            const sSign = posSign[source];
+
+            rules.forEach(offset=>{
+                const z = (sSign+(offset-1))%12;
+                row[z]++;
+                SAV[z]++;
+            });
+        });
+
+        const tr=document.createElement("tr");
+        tr.appendChild(td(target));
+        let total=0;
+
+        signOrder.forEach(sign=>{
+            const v=row[sign-1];
+            tr.appendChild(td(v));
+            total+=v;
+        });
+
+        tr.appendChild(td(total,true));
+        table.appendChild(tr);
+    });
+
+    // TOTAL row
+    const trTotal=document.createElement("tr");
+    trTotal.appendChild(td("Total",true));
+    let grand=0;
+
+    signOrder.forEach(sign=>{
+        const v=SAV[sign-1];
+        trTotal.appendChild(td(v,true));
+        grand+=v;
+    });
+
+    trTotal.appendChild(td(grand,true));
+    table.appendChild(trTotal);
+
+
+
+
+
+    // LAGNA row (CUSTOM LAGNA BAV RULES — DIRECT TARGET RULES)
+
+	const LAGNA_BAV_RULES = {
+		Surya:   [3,4,6,10,11,12],
+		Chandra: [3,6,10,11,12],
+		Mangala: [1,3,6,10,11],
+		Budha:   [1,2,4,6,8,10,11],
+		Jupiter: [1,2,4,5,6,7,9,10,11],
+		Venus:   [1,2,3,4,5,8,9],
+		Saturn:  [1,3,4,6,10,11],
+		Lagna:   [3,6,10,11]
+	};
+
+	const lagnaRow = Array(12).fill(0);
+	const lagnaSign = posSign["Lagna"];
+
+	Object.entries(LAGNA_BAV_RULES).forEach(([source, rules])=>{
+		const sSign = posSign[source];
+		if(sSign===undefined) return;
+
+		rules.forEach(offset=>{
+			const z=(sSign+(offset-1))%12;
+			lagnaRow[z]++;
+		});
+	});
+
+
+
+
+
+    const trLagna=document.createElement("tr");
+    trLagna.appendChild(td("Lagna",true));
+    let lagTot=0;
+
+    signOrder.forEach(sign=>{
+        const v=lagnaRow[sign-1];
+        trLagna.appendChild(td(v,true));
+        lagTot+=v;
+    });
+
+    trLagna.appendChild(td(lagTot,true));
+    table.appendChild(trLagna);
+
+    // RAHU row (ALWAYS ADDED)
+    const rahuRow = Array(12).fill(0);
+
+    [...planets7,"Lagna"].forEach(source=>{
+        const rules = BAV_RULES["Rahu"][source];
+        const sSign = posSign[source];
+
+        if(rules){
+            rules.forEach(offset=>{
+                const z=(sSign+(offset-1))%12;
+                rahuRow[z]++;
+            });
+        }
+    });
+
+    const trRahu=document.createElement("tr");
+    trRahu.appendChild(td("Rahu",true));
+    let rTot=0;
+
+    signOrder.forEach(sign=>{
+        const v=rahuRow[sign-1];
+        trRahu.appendChild(td(v,true));
+        rTot+=v;
+    });
+
+    trRahu.appendChild(td(rTot,true));
+    table.appendChild(trRahu);
+
+    container.appendChild(table);
+}
+
+
 
 
 render();
