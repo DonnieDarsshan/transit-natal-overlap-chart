@@ -416,11 +416,7 @@ table td, table th{
 
 
     <div style="display:flex;gap:15px;flex-wrap:wrap;justify-content:center;">
-        <input type="file" id="natalFile" accept=".json" style="display:none">
-        <button onclick="document.getElementById('natalFile').click()">LOAD NATAL JSON</button>
-
-        <input type="file" id="transitFile" accept=".json" style="display:none">
-        <button onclick="document.getElementById('transitFile').click()">LOAD TRANSIT JSON</button>
+        
         
         <label style="display:flex;align-items:center;gap:6px;font-weight:bold;">
             <input type="checkbox" id="hideCusps" checked> Hide Cusps
@@ -580,7 +576,7 @@ table td, table th{
     <div style="width:100%;max-width:1400px;margin:0 auto;">
         <table id="planetAspectTable">
             <thead><tr><th>Transit Planet</th></tr></thead>
-            <tbody><tr><td colspan="13" style="padding:20px;font-weight:bold;color:#ffcc00;">Load Natal + Transit JSON to generate table</td></tr></tbody>
+            <tbody><tr><td colspan="13" style="padding:20px;font-weight:bold;color:#ffcc00;">Fetch Natal and Transit Data to generate table</td></tr></tbody>
         </table>
     </div>
 </div>
@@ -589,7 +585,7 @@ table td, table th{
 <div class="collapse-body">
     <table id="cuspAspectTable" style="width:100%;margin:0 auto;">
         <thead><tr><th>Transit Planet</th></tr></thead>
-        <tbody><tr><td colspan="13" style="padding:20px;font-weight:bold;color:#ffcc00;">Load Natal + Transit JSON to generate table</td></tr></tbody>
+        <tbody><tr><td colspan="13" style="padding:20px;font-weight:bold;color:#ffcc00;">Fetch Natal and Transit Data to generate table</td></tr></tbody>
     </table>
 </div>
 
@@ -1155,23 +1151,7 @@ function calcSingleBAV(nData, target){
     return row;
 }
 
-document.getElementById("natalFile").onchange = e=>{
-    const r = new FileReader();
-    r.onload = f=>{
-        natal = JSON.parse(f.target.result);
-        render();
-    };
-    r.readAsText(e.target.files[0]);
-};
 
-document.getElementById("transitFile").onchange = e=>{
-    const r = new FileReader();
-    r.onload = f=>{
-        transit = JSON.parse(f.target.result);
-        render();
-    };
-    r.readAsText(e.target.files[0]);
-};
 
 function degToText(d){
     const deg = Math.floor(d%30);
@@ -1548,7 +1528,7 @@ function render(){
                 }
             }else{
                 h.innerHTML+=`<div class="house-num">${idx+1}</div>`;
-                h.innerHTML+=`<div class="cusp-line">Load Natal JSON</div>`;
+                
                 k.appendChild(h);
             }
         });
