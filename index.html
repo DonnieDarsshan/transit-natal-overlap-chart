@@ -32,26 +32,14 @@ body{
     padding:20px;
 }
 
-/* ==========================================
-     CSS: CLOUD FETCHER (NATIVE THEME)
-=========================================== */
-.theme-box { width: 100%; background: #000; border: 2px solid var(--grid-line); padding: 15px; box-sizing: border-box; }
-.theme-box.transit { border-color: var(--transit); }
-.theme-title { font-weight: bold; font-size: 16px; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
-.theme-title.natal { color: var(--grid-line); }
-.theme-title.transit { color: var(--transit); }
-.theme-row { display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-end; margin-bottom: 15px; }
-.theme-group { display: flex; flex-direction: column; gap: 8px; }
-.theme-label { font-size: 11px; color: #aaa; font-weight: bold; text-transform: uppercase; }
-.theme-input { background: #111; color: #fff; border: 1px solid #555; padding: 4px 6px; font-weight: bold; font-size: 14px; text-align: center; }
-.theme-input:focus { border-color: var(--grid-line); outline: none; }
-.transit .theme-input:focus { border-color: var(--transit); }
-.theme-btn { background: #111; color: #fff; border: 1px solid #555; padding: 4px 10px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-.theme-btn:hover { background: #333; border-color: #fff; }
-.theme-btn.fetch-n { background: #2b0000; color: var(--grid-line); border-color: var(--grid-line); }
-.theme-btn.fetch-n:hover { background: var(--grid-line); color: #000; }
-.theme-btn.fetch-t { background: #002b3d; color: var(--transit); border-color: var(--transit); }
-.theme-btn.fetch-t:hover { background: var(--transit); color: #000; }
+
+
+
+
+
+
+
+
 
 .controls{
     display:flex;
@@ -304,103 +292,239 @@ table td, table th{
     <button onclick="adjustTransitDate(1)" style="background:#002b3d; color:var(--transit); border:1px solid var(--transit); padding:4px 10px; cursor:pointer; font-weight:bold; border-radius:2px;">&gt;</button>
 </div>
 
-<div style="display:flex; flex-direction:column; gap:15px; align-items:stretch; margin-bottom: 20px; width: 100%;">
 
 
 
 
-    <div class="theme-box">
-        <div class="theme-title natal">
-            <span style="flex: 1;">NATAL CLOUD HOROSCOPE</span>
-            <span style="flex: 1; text-align: center; font-size:12px; color:#aaa;">Profile Name: <input type="text" id="onName" class="theme-input" style="width:150px; text-align:left;"></span>
-            <span style="flex: 1;"></span>
+
+
+
+
+
+
+
+
+
+<input type="file" id="loadProfileInputNatal" accept=".json" style="display:none" onchange="loadCloudProfile(event, 'Natal')">
+<input type="file" id="loadProfileInputTransit" accept=".json" style="display:none" onchange="loadCloudProfile(event, 'Transit')">
+
+<style>
+    
+	
+/* Fortified CSS to prevent layout breaking */
+    .onlineFetchBox { 
+        background: #111;
+        border: 2px solid;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+        padding: 20px; 
+        margin: 20px auto 30px auto;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        color: #ecfdf5;
+        font-family: Arial, sans-serif;
+        width: 100%;
+        max-width: 100%; /* EXPANDS TO FULL SCREEN EDGE */
+        box-sizing: border-box;
+    }
+    .onlineFetchBox * { box-sizing: border-box; }
+    .onlineFetchBox .fetch-row { display: flex; flex-wrap: nowrap; gap: 20px; align-items: flex-end; width: 100%; justify-content: space-between; }
+    .onlineFetchBox .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .onlineFetchBox input, .onlineFetchBox select { 
+        background: #000;
+        color: #facc15; border: 1px solid #c9a227; border-radius: 4px; padding: 6px 10px; font-weight: bold; outline: none; height: 32px; font-size: 14px;
+    }
+    .onlineFetchBox input:focus, .onlineFetchBox select:focus { border-color: #10b981; }
+    .onlineFetchBox select option { background: #000; color: #facc15; }
+    
+    .action-btn { font-weight: bold; padding: 6px 16px; border-radius: 4px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 32px; font-size: 13px;}
+    .btn-clear-fetch { background: linear-gradient(135deg, #64748b, #334155); color: #fff; border: 1px solid #475569; }
+    .btn-load-fetch { background: linear-gradient(135deg, #ea580c, #9a3412); color: #fff; border: 1px solid #c2410c; }
+    .btn-save-fetch { background: linear-gradient(135deg, #2563eb, #1e40af); color: #fff; border: 1px solid #1d4ed8; }
+</style>
+
+<div class="onlineFetchBox" style="border-color: #60a5fa;">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(96,165,250,0.3); padding-bottom: 12px;">
+        <div style="color: #60a5fa; font-size: 16px; font-weight: 900; letter-spacing: 1px;">&#x1F310; NATAL CLOUD FETCHER</div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <span style="color: #ecfdf5; font-size: 13px; font-weight: bold;">Profile Name:</span>
+            <input type="text" id="onNameNatal" placeholder="e.g. JOHN DOE" style="width: 200px; text-align: center; text-transform: uppercase;">
         </div>
-        <div class="theme-row">
-            <div class="theme-group">
-                <span class="theme-label">Date (DD-MM-YYYY)</span>
-                <div style="display:flex; gap:4px;">
-                    <input type="text" id="onDay" class="theme-input" style="width:35px;" maxlength="2" onkeydown="arrowSpinner(event,1,31,2)" oninput="smartJump(this,'onMonth','day')">
-                    <input type="text" id="onMonth" class="theme-input" style="width:35px;" maxlength="2" onkeydown="arrowSpinner(event,1,12,2)" oninput="smartJump(this,'onYear','month')">
-                    <input type="text" id="onYear" class="theme-input" style="width:55px;" maxlength="4" onkeydown="arrowSpinner(event,1900,2100,4)" oninput="smartJump(this,'onHour','year')">
-                </div>
-            </div>
-            <div class="theme-group">
-                <span class="theme-label">Time (HH:MM:SS)</span>
-                <div style="display:flex; gap:4px;">
-                    <input type="text" id="onHour" class="theme-input" style="width:35px;" maxlength="2" onkeydown="arrowSpinner(event,0,23,2)" oninput="smartJump(this,'onMin','hour')">
-                    <input type="text" id="onMin" class="theme-input" style="width:35px;" maxlength="2" onkeydown="arrowSpinner(event,0,59,2)" oninput="smartJump(this,'mapSearchQuery','minute')">
-                    <input type="text" id="onSec" class="theme-input" style="width:35px;" maxlength="2" value="00" onkeydown="arrowSpinner(event,0,59,2)">
-                </div>
-            </div>
-            <div class="theme-group">
-                <span class="theme-label">Coordinates (Lat & Lon)</span>
-                <div style="display:flex; gap:4px;">
-                    <input type="text" id="onlineLat" class="theme-input" style="width:75px;" value="13.3190737">
-                    <input type="text" id="onlineLon" class="theme-input" style="width:75px;" value="77.1326306">
-                </div>
-            </div>
-        </div>
-        <div class="theme-row" style="justify-content: space-between; border-top: 1px solid #333; padding-top: 10px;">
+    </div>
+ 
+    <div class="fetch-row">
+        <div class="form-group">
+            <span style="font-size: 13px; color:#bbb; font-weight: bold;">&#x1F4C5; Date (DD-MM-YYYY)</span>
             <div style="display:flex; gap:6px; align-items:center;">
-                <input type="text" id="mapSearchQuery" class="theme-input" style="width:150px; text-align:left;" placeholder="Search Place..." onkeydown="if(event.key === 'Enter') searchOnlineMap()">
-                <button class="theme-btn" onclick="searchOnlineMap()">Search Map</button>
-                <select id="mapSearchResults" class="theme-input" style="display:none; width:150px;" onchange="applyMapSelection()"></select>
-                <span id="detectedTzBadge" style="background: var(--card-border); padding: 4px 8px; font-size: 11px; font-weight: bold; color: var(--accent-secondary); display: none;">Asia/Kolkata</span>
+                <input type="text" id="onDay" placeholder="DD" maxlength="2" style="width:55px; text-align:center;" onkeydown="arrowSpinner(event, 1, 31, 2)" oninput="smartJump(this, 'onMonth', 'day')"> -
+                <input type="text" id="onMonth" placeholder="MM" maxlength="2" style="width:55px; text-align:center;" onkeydown="arrowSpinner(event, 1, 12, 2)" oninput="smartJump(this, 'onYear', 'month')"> -
+                <input type="text" id="onYear" placeholder="YYYY" maxlength="4" style="width:75px; text-align:center;" onkeydown="arrowSpinner(event, 1900, 2100, 4)" oninput="smartJump(this, 'onHour', 'year')">
             </div>
+        </div>
+
+        <div class="form-group">
+            <span style="font-size: 13px; color:#bbb; font-weight: bold;">&#x23F1; Time (HH:MM:SS)</span>
+            <div style="display:flex; gap:6px; align-items:center;">
+                <input type="text" id="onHour" placeholder="HH" maxlength="2" style="width:55px; text-align:center;" onkeydown="arrowSpinner(event, 0, 23, 2)" oninput="smartJump(this, 'onMin', 'hour')"> :
+                <input type="text" id="onMin" placeholder="MM" maxlength="2" style="width:55px; text-align:center;" onkeydown="arrowSpinner(event, 0, 59, 2)" oninput="smartJump(this, 'mapSearchQueryNatal', 'minute')"> :
+                <input type="text" id="onSec" value="00" maxlength="2" style="width:55px; text-align:center;" onkeydown="arrowSpinner(event, 0, 59, 2)">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <span style="font-size: 13px; color:#bbb; font-weight: bold;">&#x1F4CD; Standard Places</span>
+            <select id="locationPresetNatal" onchange="applyPresetLocation('Natal')" style="width: 200px;">
+                <option value="manual">Manual GPS (Default)</option>
+                <option value="13.3190737,77.1326306">Tumakuru</option>
+                <option value="12.918880,77.634986">Bengaluru</option>
+                <option value="13.315527,76.942059">Gubbi</option>
+                <option value="12.304776,76.655108">Mysore</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="fetch-row" style="margin-top: 5px;">
+        <div class="form-group" style="width: 100%;">
+            <span style="font-size: 13px; color:#bbb; font-weight: bold;">&#x1F4CD; Coordinates: Latitude | Longitude | Lat (DMS) | Lon (DMS)</span>
             <div style="display:flex; gap:8px; align-items:center;">
-                <div id="serverWakeContainer" style="display:none; color:var(--grid-line); font-size:12px; font-weight:bold;">> WAKING...</div>
-                <input type="file" id="loadProfileInput" accept=".json" style="display:none" onchange="loadCloudProfile(event)">
-                <button class="theme-btn" onclick="document.getElementById('loadProfileInput').click()">Load</button>
-                <button class="theme-btn" onclick="saveCloudProfile()">Save</button>
-                <button id="fetchCloudBtn" class="theme-btn fetch-n" onclick="fetchFromCloud()">FETCH NATAL</button>
+                <input type="text" id="onlineLat" value="13.340077" style="width: 100px; text-align:center;" oninput="syncCoords('dec', 'Natal')">
+                <input type="text" id="onlineLon" value="77.100621" style="width: 100px; text-align:center;" oninput="syncCoords('dec', 'Natal')">
+                <span style="color:#c9a227; margin:0 4px;">|</span>
+                
+                <input type="text" id="dmsLatDeg_Natal" value="13" style="width:45px; text-align:center;" oninput="syncCoords('dms', 'Natal')"><span style="color:#facc15;">°</span>
+                <select id="dmsLatDir_Natal" style="padding:6px 2px; width:50px; text-align:center;" onchange="syncCoords('dms', 'Natal')">
+                    <option value="N" selected>N</option><option value="S">S</option>
+                </select>
+                <input type="text" id="dmsLatMin_Natal" value="20" style="width:45px; text-align:center;" oninput="syncCoords('dms', 'Natal')"><span style="color:#facc15;">'</span>
+                <input type="text" id="dmsLatSec_Natal" value="24" style="width:45px; text-align:center;" oninput="syncCoords('dms', 'Natal')"><span style="color:#facc15;">"</span>
+                
+                <span style="color:#c9a227; margin:0 4px;">|</span>
+                
+                <input type="text" id="dmsLonDeg_Natal" value="77" style="width:45px; text-align:center;" oninput="syncCoords('dms', 'Natal')"><span style="color:#facc15;">°</span>
+                <select id="dmsLonDir_Natal" style="padding:6px 2px; width:50px; text-align:center;" onchange="syncCoords('dms', 'Natal')">
+                    <option value="E" selected>E</option><option value="W">W</option>
+                </select>
+                <input type="text" id="dmsLonMin_Natal" value="06" style="width:45px; text-align:center;" oninput="syncCoords('dms', 'Natal')"><span style="color:#facc15;">'</span>
+                <input type="text" id="dmsLonSec_Natal" value="02" style="width:45px; text-align:center;" oninput="syncCoords('dms', 'Natal')"><span style="color:#facc15;">"</span>
             </div>
         </div>
     </div>
+    
+    <div class="fetch-row" style="border-top: 1px solid rgba(96,165,250,0.3); padding-top: 15px;">
+        <div class="form-group" style="flex: 1;">
+            <span style="color:#bbb; font-size: 13px; font-weight: bold;">&#x1F50D; Online Map Search</span>
+            <div style="display:flex; gap:8px; align-items: center;">
+                <input type="text" id="mapSearchQueryNatal" placeholder="Search Place..." style="width: 180px;" onkeydown="if(event.key === 'Enter') searchOnlineMap('Natal')">
+                <button onclick="searchOnlineMap('Natal')" class="action-btn" style="background: #111; color: #60a5fa; border: 1px solid #60a5fa;">Search</button>
+                <select id="mapSearchResultsNatal" style="display:none; width: 150px; margin: 0;" onchange="applyMapSelection('Natal')"></select>
+                <span id="detectedTzBadgeNatal" style="background: rgba(96,165,250,0.2); padding: 6px 10px; font-size: 12px; font-weight: bold; color: #60a5fa; border: 1px solid #60a5fa; border-radius: 4px; display: none;">Asia/Kolkata</span>
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <div id="serverWakeContainerNatal" style="visibility: hidden; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-family: monospace; font-weight: bold; margin-right: 10px;">
+                <span id="wakeMessageNatal" style="color: #60a5fa; font-size: 12px;">> SYS.WAKE</span>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <span id="digitalClockPartNatal" style="font-size: 20px; letter-spacing: 1px; color: #60a5fa;">00:00</span>
+                </div>
+            </div>
 
-    <div class="theme-box transit">
-        <div class="theme-title transit">
-            <span>TRANSIT HOROSCOPE (AUTO-UPDATES ON ARROW PRESS)</span>
-        </div>
-        <div class="theme-row">
-            <div class="theme-group">
-                <span class="theme-label">Date (DD-MM-YYYY)</span>
-                <div style="display:flex; gap:4px;">
-                    <input type="text" id="trDay" class="theme-input" style="width:35px;" maxlength="2" onkeydown="arrowSpinner(event,1,31,2)" oninput="smartJump(this,'trMonth','day'); scheduleTransitFetch()">
-                    <input type="text" id="trMonth" class="theme-input" style="width:35px;" maxlength="2" onkeydown="arrowSpinner(event,1,12,2)" oninput="smartJump(this,'trYear','month'); scheduleTransitFetch()">
-                    <input type="text" id="trYear" class="theme-input" style="width:55px;" maxlength="4" onkeydown="arrowSpinner(event,1900,2100,4)" oninput="smartJump(this,'trHour','year'); scheduleTransitFetch()">
-                </div>
-            </div>
-            <div class="theme-group">
-                <span class="theme-label">Time (HH:MM:SS)</span>
-                <div style="display:flex; gap:4px;">
-                    <input type="text" id="trHour" class="theme-input" style="width:35px;" maxlength="2" onkeydown="arrowSpinner(event,0,23,2)" oninput="smartJump(this,'trMin','hour'); scheduleTransitFetch()">
-                    <input type="text" id="trMin" class="theme-input" style="width:35px;" maxlength="2" onkeydown="arrowSpinner(event,0,59,2)" oninput="scheduleTransitFetch()">
-                    <input type="text" id="trSec" class="theme-input" style="width:35px;" maxlength="2" value="00" onkeydown="arrowSpinner(event,0,59,2)" oninput="scheduleTransitFetch()">
-                </div>
-            </div>
-            <div class="theme-group">
-                <span class="theme-label">Coordinates (Lat & Lon)</span>
-                <div style="display:flex; gap:4px;">
-                    <input type="text" id="trLat" class="theme-input" style="width:75px;" value="13.3190737" oninput="scheduleTransitFetch()">
-                    <input type="text" id="trLon" class="theme-input" style="width:75px;" value="77.1326306" oninput="scheduleTransitFetch()">
-                </div>
-            </div>
-        </div>
-        <div class="theme-row" style="justify-content: space-between; border-top: 1px solid #333; padding-top: 10px;">
-            <div style="display:flex; gap:6px; align-items:center;">
-                <input type="text" id="trSearchQuery" class="theme-input" style="width:150px; text-align:left;" placeholder="Search Place..." onkeydown="if(event.key === 'Enter') searchTrMap()">
-                <button class="theme-btn" onclick="searchTrMap()">Search Map</button>
-                <select id="trSearchResults" class="theme-input" style="display:none; width:150px;" onchange="applyTrMapSelection()"></select>
-                <span id="trDetectedTzBadge" style="background: var(--card-border); padding: 4px 8px; font-size: 11px; font-weight: bold; color: var(--accent-secondary); display: none;">Asia/Kolkata</span>
-            </div>
-            <div style="display:flex; gap:8px; align-items:center;">
-                <div id="trWakeMessage" style="color:var(--transit); font-size:12px; font-weight:bold; display:none;">> FETCHING...</div>
-                <button class="theme-btn" onclick="setTransitToNow()">Reset to Now</button>
-                <button id="fetchTransitBtn" class="theme-btn fetch-t" onclick="fetchTransitCloud()">FORCE FETCH</button>
-            </div>
+            <button class="action-btn btn-clear-fetch" onclick="clearFetchData('Natal')">&#x1F9F9; Clear</button>
+            <button class="action-btn btn-load-fetch" onclick="document.getElementById('loadProfileInputNatal').click()">&#x1F4C2; Load</button>
+            <button class="action-btn btn-save-fetch" onclick="saveCloudProfile('Natal')">&#x1F4BE; Save</button>
+            <button id="fetchCloudBtnNatal" class="action-btn" style="background: linear-gradient(145deg,#60a5fa,#2563eb); border:1px solid #60a5fa; color:#fff;" onclick="fetchFromCloud('Natal')">FETCH NATAL</button>
         </div>
     </div>
 </div>
+
+<div class="onlineFetchBox" style="border-color: #f472b6;">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(244,114,182,0.3); padding-bottom: 12px;">
+        <div style="color: #f472b6; font-size: 16px; font-weight: 900; letter-spacing: 1px;">&#x1F310; TRANSIT CLOUD FETCHER (AUTO-UPDATES)</div>
+    </div>
+ 
+    <div class="fetch-row">
+        <div class="form-group">
+            <span style="font-size: 13px; color:#bbb; font-weight: bold;">&#x1F4C5; Date (DD-MM-YYYY)</span>
+            <div style="display:flex; gap:6px; align-items:center;">
+                <input type="text" id="trDay" placeholder="DD" maxlength="2" style="width:55px; text-align:center;" onkeydown="arrowSpinner(event, 1, 31, 2)" oninput="smartJump(this, 'trMonth', 'day'); scheduleTransitFetch()"> -
+                <input type="text" id="trMonth" placeholder="MM" maxlength="2" style="width:55px; text-align:center;" onkeydown="arrowSpinner(event, 1, 12, 2)" oninput="smartJump(this, 'trYear', 'month'); scheduleTransitFetch()"> -
+                <input type="text" id="trYear" placeholder="YYYY" maxlength="4" style="width:75px; text-align:center;" onkeydown="arrowSpinner(event, 1900, 2100, 4)" oninput="smartJump(this, 'trHour', 'year'); scheduleTransitFetch()">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <span style="font-size: 13px; color:#bbb; font-weight: bold;">&#x23F1; Time (HH:MM:SS)</span>
+            <div style="display:flex; gap:6px; align-items:center;">
+                <input type="text" id="trHour" placeholder="HH" maxlength="2" style="width:55px; text-align:center;" onkeydown="arrowSpinner(event, 0, 23, 2)" oninput="smartJump(this, 'trMin', 'hour'); scheduleTransitFetch()"> :
+                <input type="text" id="trMin" placeholder="MM" maxlength="2" style="width:55px; text-align:center;" onkeydown="arrowSpinner(event, 0, 59, 2)" oninput="smartJump(this, 'mapSearchQueryTransit', 'minute'); scheduleTransitFetch()"> :
+                <input type="text" id="trSec" value="00" maxlength="2" style="width:55px; text-align:center;" onkeydown="arrowSpinner(event, 0, 59, 2)" oninput="scheduleTransitFetch()">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <span style="font-size: 13px; color:#bbb; font-weight: bold;">&#x1F4CD; Standard Places</span>
+            <select id="locationPresetTransit" onchange="applyPresetLocation('Transit')" style="width: 200px;">
+                <option value="manual">Manual GPS (Default)</option>
+                <option value="13.3190737,77.1326306">Tumakuru</option>
+                <option value="12.918880,77.634986">Bengaluru</option>
+                <option value="13.315527,76.942059">Gubbi</option>
+                <option value="12.304776,76.655108">Mysore</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="fetch-row" style="margin-top: 5px;">
+        <div class="form-group" style="width: 100%;">
+            <span style="font-size: 13px; color:#bbb; font-weight: bold;">&#x1F4CD; Coordinates: Latitude | Longitude | Lat (DMS) | Lon (DMS)</span>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <input type="text" id="trLat" value="13.340077" style="width: 100px; text-align:center;" oninput="syncCoords('dec', 'Transit'); scheduleTransitFetch()">
+                <input type="text" id="trLon" value="77.100621" style="width: 100px; text-align:center;" oninput="syncCoords('dec', 'Transit'); scheduleTransitFetch()">
+                <span style="color:#c9a227; margin:0 4px;">|</span>
+                
+                <input type="text" id="dmsLatDeg_Transit" value="13" style="width:45px; text-align:center;" oninput="syncCoords('dms', 'Transit'); scheduleTransitFetch()"><span style="color:#facc15;">°</span>
+                <select id="dmsLatDir_Transit" style="padding:6px 2px; width:50px; text-align:center;" onchange="syncCoords('dms', 'Transit'); scheduleTransitFetch()">
+                    <option value="N" selected>N</option><option value="S">S</option>
+                </select>
+                <input type="text" id="dmsLatMin_Transit" value="20" style="width:45px; text-align:center;" oninput="syncCoords('dms', 'Transit'); scheduleTransitFetch()"><span style="color:#facc15;">'</span>
+                <input type="text" id="dmsLatSec_Transit" value="24" style="width:45px; text-align:center;" oninput="syncCoords('dms', 'Transit'); scheduleTransitFetch()"><span style="color:#facc15;">"</span>
+                
+                <span style="color:#c9a227; margin:0 4px;">|</span>
+                
+                <input type="text" id="dmsLonDeg_Transit" value="77" style="width:45px; text-align:center;" oninput="syncCoords('dms', 'Transit'); scheduleTransitFetch()"><span style="color:#facc15;">°</span>
+                <select id="dmsLonDir_Transit" style="padding:6px 2px; width:50px; text-align:center;" onchange="syncCoords('dms', 'Transit'); scheduleTransitFetch()">
+                    <option value="E" selected>E</option><option value="W">W</option>
+                </select>
+                <input type="text" id="dmsLonMin_Transit" value="06" style="width:45px; text-align:center;" oninput="syncCoords('dms', 'Transit'); scheduleTransitFetch()"><span style="color:#facc15;">'</span>
+                <input type="text" id="dmsLonSec_Transit" value="02" style="width:45px; text-align:center;" oninput="syncCoords('dms', 'Transit'); scheduleTransitFetch()"><span style="color:#facc15;">"</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="fetch-row" style="border-top: 1px solid rgba(244,114,182,0.3); padding-top: 15px;">
+        <div class="form-group" style="flex: 1;">
+            <span style="color:#bbb; font-size: 13px; font-weight: bold;">&#x1F50D; Online Map Search</span>
+            <div style="display:flex; gap:8px; align-items: center;">
+                <input type="text" id="mapSearchQueryTransit" placeholder="Search Place..." style="width: 180px;" onkeydown="if(event.key === 'Enter') searchOnlineMap('Transit')">
+                <button onclick="searchOnlineMap('Transit')" class="action-btn" style="background: #111; color: #f472b6; border: 1px solid #f472b6;">Search</button>
+                <select id="mapSearchResultsTransit" style="display:none; width: 150px; margin: 0;" onchange="applyMapSelection('Transit')"></select>
+                <span id="detectedTzBadgeTransit" style="background: rgba(244,114,182,0.2); padding: 6px 10px; font-size: 12px; font-weight: bold; color: #f472b6; border: 1px solid #f472b6; border-radius: 4px; display: none;">Asia/Kolkata</span>
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <div id="serverWakeContainerTransit" style="visibility: hidden; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-family: monospace; font-weight: bold; margin-right: 10px;">
+                <span id="wakeMessageTransit" style="color: #f472b6; font-size: 12px;">> FETCH...</span>
+            </div>
+
+            <button class="action-btn btn-clear-fetch" onclick="setTransitToNow()">&#x23F1; Reset to Now</button>
+            <button id="fetchCloudBtnTransit" class="action-btn" style="background: linear-gradient(145deg,#f472b6,#db2777); border:1px solid #f472b6; color:#fff;" onclick="fetchFromCloud('Transit')">FORCE FETCH</button>
+        </div>
+    </div>
+</div>
+
+
+
 
 
 
@@ -514,7 +638,7 @@ table td, table th{
     <div id="doubleTransitSummaryMirror" style="margin-top:6px;font-weight:bold;color:#00e5ff;text-align:center;"></div>
 </div>
 
-<div id="dateBar" style="width:850px; margin:10px auto 20px auto; background:#020617; border-top:3px solid #ffcc00; border-bottom:3px solid #ffcc00; color:#00e5ff; font-weight:bold; font-size:16px; padding:8px; text-align:center;">
+<div id="dateBar" style="width:100%; margin:10px auto 20px auto; background:#020617; border-top:3px solid #ffcc00; border-bottom:3px solid #ffcc00; color:#00e5ff; font-weight:bold; font-size:16px; padding:8px; text-align:center; box-sizing: border-box;">
     <span id="birthDateText" style="color:#ffcc00;">Birth Date : --</span>
     <span style="display:inline-block;width:120px;"></span>
     <span id="transitDateText" style="color:#00e5ff;">Transit Date : --</span>
@@ -524,31 +648,31 @@ table td, table th{
 
 <h2 class="collapsible" style="margin-top:40px;text-align:center;">Transit Nakshatra & Rotated Lordships</h2>
 <div class="collapse-body" style="display:block;"> 
-    <div id="nakshatraTablesContainer" style="width:100%; max-width:1200px; margin:0 auto;"></div>
+    <div id="nakshatraTablesContainer" style="width:100%; margin:0 auto; overflow-x: auto;"></div>
     
-    <div id="pivotCuspalTable" style="width:100%; max-width:1000px; margin:40px auto 0 auto;"></div>
+    <div id="pivotCuspalTable" style="width:100%; margin:40px auto 0 auto; overflow-x: auto;"></div>
 </div>
 
 <style>
-.ashta-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; width:900px; }
+.ashta-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:20px; width:100%; justify-items:center; }
 .ashta-kundali{ width:260px; height:260px; border:3px solid #ffcc00; display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(4,1fr); background:#111; }
 .ashta-cell{ display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:18px; border:1px solid #555; }
-.ashta-center{ grid-column:2/4; grid-row:2/4; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#ffcc00; }
+.ashta-center{ grid-column:2/4; grid-row:2/4; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#ffcc00; text-align:center; }
 </style>
 
 <h2 class="collapsible" style="margin-top:40px;text-align:center;">Ashtakavarga Kundalis</h2>
 <div class="collapse-body">
-    <div id="ashtakavargaContainer" style="width:900px; margin:20px auto; display:flex; flex-direction:column; gap:20px; align-items:center;"></div>
+    <div id="ashtakavargaContainer" style="width:100%; margin:20px auto; display:flex; flex-direction:column; gap:20px; align-items:stretch;"></div>
 </div>
 
 <h2 class="collapsible" style="margin-top:40px;text-align:center;">Sarvashtakavarga</h2>
 <div class="collapse-body">
-    <div id="savTable" style="width:850px;margin:20px auto 0 auto;"></div>
+    <div id="savTable" style="width:100%; margin:20px auto 0 auto; overflow-x: auto;"></div>
 </div>
 
 <h2 class="collapsible" style="margin-top:40px;text-align:center;">BINNA ASHTAKAVARGA</h2>
 <div class="collapse-body">
-    <div style="width:850px;margin:20px auto 0 auto;text-align:center;">
+    <div style="width:100%; margin:20px auto 0 auto; text-align:center;">
         <label style="font-weight:bold;">
             BINNA ASHTAKAVARGA
             <select id="bavSelect">
@@ -564,7 +688,7 @@ table td, table th{
             </select>
         </label>
     </div>
-    <div id="bavTable" style="width:850px;margin:10px auto 0 auto;"></div>
+    <div id="bavTable" style="width:100%; margin:10px auto 0 auto; overflow-x: auto;"></div>
 </div>
 
 <h2 class="collapsible" style="margin-top:40px;text-align:center;">Transit → Natal Planet Aspects</h2>
@@ -611,81 +735,38 @@ table td, table th{
 let natal = null;
 let transit = null;
 
-
-
-
-
-
-
-
-
-
-
-
-
 // ==========================================
-// CLOUD HOROSCOPE FETCHER LOGIC
+// CLOUD HOROSCOPE FETCHER LOGIC 
+// (Adapted for Natal/Transit directly)
 // ==========================================
-let currentMapResults = [];
-let trMapResults = [];
+
+let mapResults = { Natal: [], Transit: [] };
+let timezoneStr = { Natal: "Asia/Kolkata", Transit: "Asia/Kolkata" };
 let transitFetchTimer = null;
-let onTimezoneStr = "Asia/Kolkata";
-let trTimezoneStr = "Asia/Kolkata";
+
+window.addEventListener('DOMContentLoaded', () => {
+    setTransitToNow();
+});
 
 function adjustTransitDate(direction) {
-    // 1. Read current transit inputs
     let d = parseInt(document.getElementById("trDay").value) || 1;
     let m = parseInt(document.getElementById("trMonth").value) || 1;
     let y = parseInt(document.getElementById("trYear").value) || new Date().getFullYear();
 
-    // 2. Create native JS Date object (Month is 0-indexed in JS, so m - 1)
     let dateObj = new Date(y, m - 1, d);
-    
-    // 3. Get the selected step from dropdown
     let stepVal = document.getElementById("transitStepSelect").value;
-    let amount = parseInt(stepVal) * direction; // direction is -1 (Left) or 1 (Right)
+    let amount = parseInt(stepVal) * direction;
     
-    // 4. Add or subtract the exact time metric. JS automatically handles Dec->Jan rollovers.
-    if (stepVal.includes('d')) {
-        dateObj.setDate(dateObj.getDate() + amount);
-    } else if (stepVal.includes('m')) {
-        dateObj.setMonth(dateObj.getMonth() + amount);
-    } else if (stepVal.includes('y')) {
-        dateObj.setFullYear(dateObj.getFullYear() + amount);
-    }
+    if (stepVal.includes('d')) { dateObj.setDate(dateObj.getDate() + amount); } 
+    else if (stepVal.includes('m')) { dateObj.setMonth(dateObj.getMonth() + amount); } 
+    else if (stepVal.includes('y')) { dateObj.setFullYear(dateObj.getFullYear() + amount); }
 
-    // 5. Write the newly calculated values back to the input boxes
     document.getElementById("trDay").value = String(dateObj.getDate()).padStart(2, '0');
     document.getElementById("trMonth").value = String(dateObj.getMonth() + 1).padStart(2, '0');
     document.getElementById("trYear").value = dateObj.getFullYear();
 
-    // 6. Force a fetch with the new date
     scheduleTransitFetch();
 }
-
-function calculateAccurateOffset(tzString, d, m, y, hr, min) {
-    try {
-        const dateStr = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}T${String(hr).padStart(2,'0')}:${String(min).padStart(2,'0')}:00Z`;
-        const dateObj = new Date(dateStr);
-        const formatter = new Intl.DateTimeFormat('en-US', { timeZone: tzString, timeZoneName: 'longOffset' });
-        const parts = formatter.formatToParts(dateObj);
-        const tzPart = parts.find(p => p.type === 'timeZoneName').value;
-        if (tzPart === 'GMT') return 0;
-        const sign = tzPart.includes('-') ? -1 : 1;
-        const match = tzPart.match(/GMT[+-](\d{1,2})(?::(\d{2}))?/);
-        if(match) {
-            const hrs = parseInt(match[1] || 0);
-            const mins = parseInt(match[2] || 0);
-            return sign * ((hrs * 60) + mins);
-        }
-        return 330;
-    } catch(e) { return 330; }
-}
-
-// Populate Transit with current date/time on load
-window.addEventListener('DOMContentLoaded', () => {
-    setTransitToNow();
-});
 
 function setTransitToNow() {
     const now = new Date();
@@ -695,27 +776,64 @@ function setTransitToNow() {
     document.getElementById("trHour").value = String(now.getHours()).padStart(2, '0');
     document.getElementById("trMin").value = String(now.getMinutes()).padStart(2, '0');
     document.getElementById("trSec").value = String(now.getSeconds()).padStart(2, '0');
-    fetchTransitCloud(); // Auto-fetch once populated
+    fetchFromCloud('Transit');
 }
 
 function scheduleTransitFetch() {
     clearTimeout(transitFetchTimer);
-    document.getElementById("trWakeMessage").style.display = "block";
-    transitFetchTimer = setTimeout(fetchTransitCloud, 1000); 
+    document.getElementById("serverWakeContainerTransit").style.visibility = "visible";
+    transitFetchTimer = setTimeout(() => { fetchFromCloud('Transit'); }, 1000); 
 }
 
 function arrowSpinner(e, min, max, padding) {
     if (e.key === "ArrowUp" || e.key === "ArrowDown") {
         e.preventDefault();
-        let val = parseInt(e.target.value);
-        if (isNaN(val)) { val = (max > 2000) ? new Date().getFullYear() : min; }
-        if (e.key === "ArrowUp") val++;
-        if (e.key === "ArrowDown") val--;
-        if (val > max) val = min;
-        if (val < min) val = max;
-        e.target.value = String(val).padStart(padding, '0');
         
-        if(e.target.id.startsWith("tr")) scheduleTransitFetch();
+        let isTransit = e.target.id.startsWith("tr");
+        let prefix = isTransit ? "tr" : "on";
+        let type = e.target.id.replace(prefix, "").toLowerCase();
+
+        // 1. Read all current values
+        let d = parseInt(document.getElementById(prefix + "Day").value) || 1;
+        let m = parseInt(document.getElementById(prefix + "Month").value) || 1;
+        let y = parseInt(document.getElementById(prefix + "Year").value) || new Date().getFullYear();
+        let hr = parseInt(document.getElementById(prefix + "Hour").value) || 0;
+        let minVal = parseInt(document.getElementById(prefix + "Min").value) || 0;
+        let sec = parseInt(document.getElementById(prefix + "Sec").value) || 0;
+
+        // 2. Build a smart Date object
+        let dateObj = new Date(y, m - 1, d, hr, minVal, sec);
+        let amount = (e.key === "ArrowUp") ? 1 : -1;
+
+        // 3. Apply the specific increment/decrement
+        if (type === "day") dateObj.setDate(dateObj.getDate() + amount);
+        else if (type === "month") dateObj.setMonth(dateObj.getMonth() + amount);
+        else if (type === "year") dateObj.setFullYear(dateObj.getFullYear() + amount);
+        else if (type === "hour") dateObj.setHours(dateObj.getHours() + amount);
+        else if (type === "min") dateObj.setMinutes(dateObj.getMinutes() + amount);
+        else if (type === "sec") dateObj.setSeconds(dateObj.getSeconds() + amount);
+        else {
+            // Fallback for non-date inputs (if any exist)
+            let val = parseInt(e.target.value);
+            if (isNaN(val)) { val = (max > 2000) ? new Date().getFullYear() : min; }
+            val += amount;
+            if (val > max) val = min;
+            if (val < min) val = max;
+            e.target.value = String(val).padStart(padding, '0');
+            if (isTransit) scheduleTransitFetch();
+            return;
+        }
+
+        // 4. Write back the perfectly calculated rollover values
+        document.getElementById(prefix + "Day").value = String(dateObj.getDate()).padStart(2, '0');
+        document.getElementById(prefix + "Month").value = String(dateObj.getMonth() + 1).padStart(2, '0');
+        document.getElementById(prefix + "Year").value = dateObj.getFullYear();
+        document.getElementById(prefix + "Hour").value = String(dateObj.getHours()).padStart(2, '0');
+        document.getElementById(prefix + "Min").value = String(dateObj.getMinutes()).padStart(2, '0');
+        document.getElementById(prefix + "Sec").value = String(dateObj.getSeconds()).padStart(2, '0');
+
+        // 5. Trigger the auto-fetch
+        if (isTransit) scheduleTransitFetch();
     }
 }
 
@@ -738,22 +856,92 @@ function smartJump(currentElement, nextElementId, type) {
     }
     if (shouldJump) {
         if (type !== 'year' && val.length === 1) currentElement.value = "0" + val;
-        document.getElementById(nextElementId).focus();
+        document.getElementById(nextElementId)?.focus();
     }
 }
 
-async function searchMapCore(queryId, dropdownId, resultsArray, btnElement) {
-    const query = document.getElementById(queryId).value.trim();
+function clearFetchData(mode) {
+    let prefix = mode === 'Natal' ? 'on' : 'tr';
+    let latId = mode === 'Natal' ? 'onlineLat' : 'trLat';
+    let lonId = mode === 'Natal' ? 'onlineLon' : 'trLon';
+    
+    if(mode === 'Natal') document.getElementById("onNameNatal").value = "";
+    document.getElementById(prefix + "Day").value = "";
+    document.getElementById(prefix + "Month").value = "";
+    document.getElementById(prefix + "Year").value = "";
+    document.getElementById(prefix + "Hour").value = "";
+    document.getElementById(prefix + "Min").value = "";
+    document.getElementById(prefix + "Sec").value = "00";
+    document.getElementById(latId).value = "";
+    document.getElementById(lonId).value = "";
+    document.getElementById(`mapSearchQuery${mode}`).value = "";
+    document.getElementById(`mapSearchResults${mode}`).style.display = "none";
+    document.getElementById(`detectedTzBadge${mode}`).style.display = "none";
+    syncCoords('dec', mode);
+}
+
+function applyPresetLocation(mode) {
+    const val = document.getElementById(`locationPreset${mode}`).value;
+    if(val !== "manual") {
+        const parts = val.split(",");
+        document.getElementById(mode === 'Natal' ? 'onlineLat' : 'trLat').value = parts[0];
+        document.getElementById(mode === 'Natal' ? 'onlineLon' : 'trLon').value = parts[1];
+        timezoneStr[mode] = "Asia/Kolkata";
+        document.getElementById(`detectedTzBadge${mode}`).innerText = timezoneStr[mode];
+        document.getElementById(`detectedTzBadge${mode}`).style.display = "inline-block";
+        syncCoords('dec', mode);
+        if(mode === 'Transit') scheduleTransitFetch();
+    }
+}
+
+function syncCoords(source, mode) {
+    let decLatId = mode === 'Natal' ? 'onlineLat' : 'trLat';
+    let decLonId = mode === 'Natal' ? 'onlineLon' : 'trLon';
+    
+    if (source === 'dec') {
+        let lat = parseFloat(document.getElementById(decLatId).value) || 0;
+        let lon = parseFloat(document.getElementById(decLonId).value) || 0;
+        
+        document.getElementById(`dmsLatDir_${mode}`).value = lat >= 0 ? 'N' : 'S';
+        lat = Math.abs(lat);
+        document.getElementById(`dmsLatDeg_${mode}`).value = Math.floor(lat);
+        document.getElementById(`dmsLatMin_${mode}`).value = Math.floor((lat % 1) * 60);
+        document.getElementById(`dmsLatSec_${mode}`).value = Math.round((((lat % 1) * 60) % 1) * 60);
+        
+        document.getElementById(`dmsLonDir_${mode}`).value = lon >= 0 ? 'E' : 'W';
+        lon = Math.abs(lon);
+        document.getElementById(`dmsLonDeg_${mode}`).value = Math.floor(lon);
+        document.getElementById(`dmsLonMin_${mode}`).value = Math.floor((lon % 1) * 60);
+        document.getElementById(`dmsLonSec_${mode}`).value = Math.round((((lon % 1) * 60) % 1) * 60);
+    } else {
+        let latD = parseFloat(document.getElementById(`dmsLatDeg_${mode}`).value) || 0;
+        let latM = parseFloat(document.getElementById(`dmsLatMin_${mode}`).value) || 0;
+        let latS = parseFloat(document.getElementById(`dmsLatSec_${mode}`).value) || 0;
+        let latDir = document.getElementById(`dmsLatDir_${mode}`).value;
+        let calcLat = latD + (latM / 60) + (latS / 3600);
+        if (latDir === 'S') calcLat *= -1;
+        document.getElementById(decLatId).value = calcLat.toFixed(6);
+
+        let lonD = parseFloat(document.getElementById(`dmsLonDeg_${mode}`).value) || 0;
+        let lonM = parseFloat(document.getElementById(`dmsLonMin_${mode}`).value) || 0;
+        let lonS = parseFloat(document.getElementById(`dmsLonSec_${mode}`).value) || 0;
+        let lonDir = document.getElementById(`dmsLonDir_${mode}`).value;
+        let calcLon = lonD + (lonM / 60) + (lonS / 3600);
+        if (lonDir === 'W') calcLon *= -1;
+        document.getElementById(decLonId).value = calcLon.toFixed(6);
+    }
+}
+
+async function searchOnlineMap(mode) {
+    const query = document.getElementById(`mapSearchQuery${mode}`).value.trim();
     if (!query) return;
-    const origText = btnElement.innerHTML;
-    btnElement.innerHTML = "...";
     try {
         const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=10`);
         const data = await res.json();
-        const drop = document.getElementById(dropdownId);
+        const drop = document.getElementById(`mapSearchResults${mode}`);
         drop.innerHTML = "";
         if (data && data.results && data.results.length > 0) {
-            resultsArray.splice(0, resultsArray.length, ...data.results);
+            mapResults[mode] = data.results;
             const def = document.createElement("option"); def.text = `-- Select Place --`; def.value = ""; drop.appendChild(def);
             data.results.forEach((p, i) => {
                 const opt = document.createElement("option");
@@ -765,47 +953,58 @@ async function searchMapCore(queryId, dropdownId, resultsArray, btnElement) {
             });
             drop.style.display = "block";
         } else {
-            drop.style.display = "none"; alert("Place not found.");
+            drop.style.display = "none";
         }
-    } catch (e) { alert("Map error."); } finally { btnElement.innerHTML = origText; }
+    } catch (e) { console.error("Map Error"); }
 }
 
-function searchOnlineMap() { searchMapCore("mapSearchQuery", "mapSearchResults", currentMapResults, event.target); }
-function searchTrMap() { searchMapCore("trSearchQuery", "trSearchResults", trMapResults, event.target); }
-
-function applyMapSelection() {
-    const idx = document.getElementById("mapSearchResults").value;
+function applyMapSelection(mode) {
+    const idx = document.getElementById(`mapSearchResults${mode}`).value;
     if (idx !== "") {
-        const selected = currentMapResults[idx];
-        document.getElementById("onlineLat").value = parseFloat(selected.latitude).toFixed(6);
-        document.getElementById("onlineLon").value = parseFloat(selected.longitude).toFixed(6);
-        onTimezoneStr = selected.timezone || "UTC";
-        const tzBadge = document.getElementById("detectedTzBadge");
-        if(tzBadge) { tzBadge.innerText = onTimezoneStr; tzBadge.style.display = "inline-block"; }
+        const selected = mapResults[mode][idx];
+        let latId = mode === 'Natal' ? 'onlineLat' : 'trLat';
+        let lonId = mode === 'Natal' ? 'onlineLon' : 'trLon';
+        
+        document.getElementById(latId).value = parseFloat(selected.latitude).toFixed(6);
+        document.getElementById(lonId).value = parseFloat(selected.longitude).toFixed(6);
+        timezoneStr[mode] = selected.timezone || "UTC";
+        
+        const tzBadge = document.getElementById(`detectedTzBadge${mode}`);
+        if(tzBadge) { tzBadge.innerText = timezoneStr[mode]; tzBadge.style.display = "inline-block"; }
+        
+        syncCoords('dec', mode);
+        if(mode === 'Transit') scheduleTransitFetch();
     }
 }
 
-function applyTrMapSelection() {
-    const idx = document.getElementById("trSearchResults").value;
-    if (idx !== "") {
-        const selected = trMapResults[idx];
-        document.getElementById("trLat").value = parseFloat(selected.latitude).toFixed(6);
-        document.getElementById("trLon").value = parseFloat(selected.longitude).toFixed(6);
-        trTimezoneStr = selected.timezone || "UTC";
-        const tzBadge = document.getElementById("trDetectedTzBadge");
-        if(tzBadge) { tzBadge.innerText = trTimezoneStr; tzBadge.style.display = "inline-block"; }
-        scheduleTransitFetch();
-    }
+function calculateAccurateOffset(tzString, d, m, y, hr, min) {
+    try {
+        const dateStr = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}T${String(hr).padStart(2,'0')}:${String(min).padStart(2,'0')}:00Z`;
+        const dateObj = new Date(dateStr);
+        const formatter = new Intl.DateTimeFormat('en-US', { timeZone: tzString, timeZoneName: 'longOffset' });
+        const parts = formatter.formatToParts(dateObj);
+        const tzPart = parts.find(p => p.type === 'timeZoneName').value;
+        if (tzPart === 'GMT') return 0;
+        const sign = tzPart.includes('-') ? -1 : 1;
+        const match = tzPart.match(/GMT[+-](\d{1,2})(?::(\d{2}))?/);
+        if(match) {
+            const hrs = parseInt(match[1] || 0);
+            const mins = parseInt(match[2] || 0);
+            return sign * ((hrs * 60) + mins);
+        }
+        return 330;
+    } catch(e) { return 330; }
 }
 
-function saveCloudProfile() {
-    const name = document.getElementById("onName").value.trim() || "Profile";
+function saveCloudProfile(mode) {
+    if(mode !== 'Natal') return; 
+    const name = document.getElementById("onNameNatal").value.trim() || "Profile";
     const profileData = {
         type: "CloudHoroscopeProfile", name: name,
         date: { d: document.getElementById("onDay").value, m: document.getElementById("onMonth").value, y: document.getElementById("onYear").value },
         time: { h: document.getElementById("onHour").value, min: document.getElementById("onMin").value, sec: document.getElementById("onSec").value },
         coords: { lat: document.getElementById("onlineLat").value, lon: document.getElementById("onlineLon").value },
-        timezoneStr: typeof onTimezoneStr !== 'undefined' ? onTimezoneStr : "Asia/Kolkata"
+        timezoneStr: timezoneStr['Natal']
     };
     const blob = new Blob([JSON.stringify(profileData, null, 2)], { type: "application/json" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
@@ -813,103 +1012,117 @@ function saveCloudProfile() {
     a.click();
 }
 
-function loadCloudProfile(event) {
+function loadCloudProfile(event, mode) {
     const file = event.target.files[0]; if (!file) return;
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
             const data = JSON.parse(e.target.result);
-            if (data.type !== "CloudHoroscopeProfile") { alert("Invalid file."); return; }
-            document.getElementById("onName").value = data.name || "";
-            if (data.date) { document.getElementById("onDay").value = data.date.d; document.getElementById("onMonth").value = data.date.m; document.getElementById("onYear").value = data.date.y; }
-            if (data.time) { document.getElementById("onHour").value = data.time.h; document.getElementById("onMin").value = data.time.min; document.getElementById("onSec").value = data.time.sec; }
-            if (data.coords){ document.getElementById("onlineLat").value = data.coords.lat; document.getElementById("onlineLon").value = data.coords.lon; }
+            if (data.type !== "CloudHoroscopeProfile") return;
             
-            if (data.timezoneStr && typeof onTimezoneStr !== 'undefined') {
-                onTimezoneStr = data.timezoneStr;
-                const tzBadge = document.getElementById("detectedTzBadge");
-                if (tzBadge) {
-                    tzBadge.innerText = onTimezoneStr;
-                    tzBadge.style.display = "inline-block";
-                }
+            let prefix = mode === 'Natal' ? 'on' : 'tr';
+            let latId = mode === 'Natal' ? 'onlineLat' : 'trLat';
+            let lonId = mode === 'Natal' ? 'onlineLon' : 'trLon';
+
+            if(mode === 'Natal') document.getElementById("onNameNatal").value = data.name || "";
+            if (data.date) { document.getElementById(prefix+"Day").value = data.date.d; document.getElementById(prefix+"Month").value = data.date.m; document.getElementById(prefix+"Year").value = data.date.y; }
+            if (data.time) { document.getElementById(prefix+"Hour").value = data.time.h; document.getElementById(prefix+"Min").value = data.time.min; document.getElementById(prefix+"Sec").value = data.time.sec; }
+            if (data.coords){ document.getElementById(latId).value = data.coords.lat; document.getElementById(lonId).value = data.coords.lon; }
+            
+            if (data.timezoneStr) {
+                timezoneStr[mode] = data.timezoneStr;
+                const tzBadge = document.getElementById(`detectedTzBadge${mode}`);
+                if (tzBadge) { tzBadge.innerText = timezoneStr[mode]; tzBadge.style.display = "inline-block"; }
             }
-            
-            // AUTO-FETCH IMMEDIATELY UPON LOAD
-            setTimeout(fetchFromCloud, 200);
-        } catch (err) { alert("File error."); }
+            syncCoords('dec', mode);
+            setTimeout(() => { fetchFromCloud(mode); }, 200);
+        } catch (err) { console.error("File error."); }
     };
     reader.readAsText(file); event.target.value = '';
 }
 
-async function fetchFromCloud() {
-    const d = document.getElementById("onDay").value; const m = document.getElementById("onMonth").value; const y = document.getElementById("onYear").value;
-    const hr = document.getElementById("onHour").value; const min = document.getElementById("onMin").value; const sec = document.getElementById("onSec").value || "00";
-    const lat = document.getElementById("onlineLat").value; const lon = document.getElementById("onlineLon").value;
-    
-    if (!d || !m || !y || !hr || !min || !lat || !lon) { alert("Fill all Natal fields."); return; }
+// Timer Logic for Wake Animation
+let serverTimers = { Natal: 0, Transit: 0 };
+let wakeIntervals = { Natal: null, Transit: null };
 
-    const calculatedOffset = calculateAccurateOffset(onTimezoneStr, d, m, y, hr, min);
-    const reqData = { year: parseInt(y), month: parseInt(m), day: parseInt(d), hour: parseInt(hr), minute: parseInt(min), second: parseInt(sec), lat: parseFloat(lat), lon: parseFloat(lon), timezone_offset: calculatedOffset, horary_mode: false };
+function startServerWakeAnimation(mode) {
+    document.getElementById(`serverWakeContainer${mode}`).style.visibility = "visible";
+    serverTimers[mode] = 0;
     
-    const btn = document.getElementById("fetchCloudBtn"); const orig = btn.innerHTML;
-    btn.innerHTML = "Fetching..."; btn.disabled = true; document.getElementById("serverWakeContainer").style.display = "block";
-
-    try {
-        const res = await fetch('https://donnie-astro-engine.onrender.com/calculate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqData) });
-        const result = await res.json();
+    if (wakeIntervals[mode]) clearInterval(wakeIntervals[mode]);
+    wakeIntervals[mode] = setInterval(() => {
+        serverTimers[mode]++;
+        const mins = Math.floor(serverTimers[mode] / 60);
+        const secs = serverTimers[mode] % 60;
+        const timeStr = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
         
-        if (result.status === "success") {
-            natal = result.data;
-            const name = document.getElementById("onName").value.trim() || "Cloud Natal";
-            const dtStr = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}T${String(hr).padStart(2,'0')}:${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}Z`;
-            natal.meta = { name: name, datetime_utc: dtStr };
-            
-            render();
-            btn.innerHTML = "SUCCESS ✓"; btn.style.background = "var(--success)"; btn.style.color = "#000";
-        } else { alert("Server Error"); }
-    } catch (e) { alert("Network Error"); } 
-    finally {
-        setTimeout(() => { btn.innerHTML = orig; btn.removeAttribute("style"); btn.disabled = false; document.getElementById("serverWakeContainer").style.display="none"; }, 2000);
-    }
+        const clockEl = document.getElementById(`digitalClockPart${mode}`);
+        if(clockEl) clockEl.innerText = timeStr;
+
+        const maxDots = 20;
+        const filled = (serverTimers[mode] % maxDots) + 1;
+        const progressStr = "[" + ".".repeat(filled) + " ".repeat(maxDots - filled) + "]";
+        const progEl = document.getElementById(`progressBarPart${mode}`);
+        if(progEl) progEl.innerText = progressStr;
+        
+    }, 1000);
 }
 
-async function fetchTransitCloud() {
-    const d = document.getElementById("trDay").value; const m = document.getElementById("trMonth").value; const y = document.getElementById("trYear").value;
-    const hr = document.getElementById("trHour").value; const min = document.getElementById("trMin").value; const sec = document.getElementById("trSec").value || "00";
-    const lat = document.getElementById("trLat").value; const lon = document.getElementById("trLon").value;
+function stopServerWakeAnimation(mode) {
+    if (wakeIntervals[mode]) clearInterval(wakeIntervals[mode]);
+    document.getElementById(`serverWakeContainer${mode}`).style.visibility = "hidden";
+    const clockEl = document.getElementById(`digitalClockPart${mode}`);
+    if(clockEl) clockEl.innerText = "00:00";
+}
+
+async function fetchFromCloud(mode) {
+    let prefix = mode === 'Natal' ? 'on' : 'tr';
+    let latId = mode === 'Natal' ? 'onlineLat' : 'trLat';
+    let lonId = mode === 'Natal' ? 'onlineLon' : 'trLon';
+
+    const d = document.getElementById(prefix+"Day").value; const m = document.getElementById(prefix+"Month").value; const y = document.getElementById(prefix+"Year").value;
+    const hr = document.getElementById(prefix+"Hour").value; const min = document.getElementById(prefix+"Min").value; const sec = document.getElementById(prefix+"Sec").value || "00";
+    const lat = document.getElementById(latId).value; const lon = document.getElementById(lonId).value;
     
     if (!d || !m || !y || !hr || !min || !lat || !lon) return;
 
-    const calculatedOffset = calculateAccurateOffset(trTimezoneStr, d, m, y, hr, min);
+    const calculatedOffset = calculateAccurateOffset(timezoneStr[mode], d, m, y, hr, min);
     const reqData = { year: parseInt(y), month: parseInt(m), day: parseInt(d), hour: parseInt(hr), minute: parseInt(min), second: parseInt(sec), lat: parseFloat(lat), lon: parseFloat(lon), timezone_offset: calculatedOffset, horary_mode: false };
     
-    const btn = document.getElementById("fetchTransitBtn"); const orig = btn.innerHTML;
-    btn.innerHTML = "..."; btn.disabled = true; document.getElementById("trWakeMessage").style.display = "block";
+    const btn = document.getElementById(`fetchCloudBtn${mode}`); 
+    const orig = btn.innerHTML;
+    btn.innerHTML = "Fetching..."; 
+    btn.disabled = true; 
+    
+    startServerWakeAnimation(mode);
 
     try {
         const res = await fetch('https://donnie-astro-engine.onrender.com/calculate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqData) });
         const result = await res.json();
         
         if (result.status === "success") {
-            transit = result.data;
             const dtStr = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}T${String(hr).padStart(2,'0')}:${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}Z`;
-            transit.meta = { name: "Transit", datetime_utc: dtStr };
             
+            if(mode === 'Natal') {
+                natal = result.data;
+                const name = document.getElementById("onNameNatal").value.trim() || "Cloud Natal";
+                natal.meta = { name: name, datetime_utc: dtStr };
+                btn.innerHTML = "SUCCESS ✓"; 
+                btn.style.background = "#39ff14"; 
+                btn.style.color = "#000";
+            } else {
+                transit = result.data;
+                transit.meta = { name: "Transit", datetime_utc: dtStr };
+                btn.innerHTML = "UPDATED ✓"; 
+            }
             render();
-            btn.innerHTML = "UPDATED ✓"; btn.style.color = "var(--transit)";
         }
-    } catch (e) { console.error("Transit network error"); } 
+    } catch (e) { console.error("Network Error"); btn.innerHTML = "ERROR X"; } 
     finally {
-        setTimeout(() => { btn.innerHTML = orig; btn.removeAttribute("style"); btn.disabled = false; document.getElementById("trWakeMessage").style.display="none"; }, 1500);
+        stopServerWakeAnimation(mode);
+        setTimeout(() => { btn.innerHTML = orig; btn.removeAttribute("style"); btn.disabled = false; }, 2000);
     }
 }
-
-
-
-
-
-
-
 
 // --- NAKSHATRA & TARA DATA ---
 
@@ -1192,6 +1405,14 @@ function renderNakshatraTables(nData, tData) {
     // If a planet is selected, the cusps are pre-rotated to it, so we lock the math rotation to 1
     const houseStart = isPlanetStart ? 1 : parseInt(houseStartVal);
 
+    // ASC SHIFT LOGIC (Fixed to properly rotate table placements)
+    const revertASC = document.getElementById("revertASC")?.checked;
+    let ascDeg = nData.lagna;
+    let houseNumberingOffset = 0;
+    if((ascDeg % 30) >= 15 && !revertASC){
+        houseNumberingOffset = 1;
+    }
+
     // 1. Build Internal Cuspal Table Data
     let cuspsData = [];
     let activeCusps = []; // Holds the raw degrees for placement calculation
@@ -1216,7 +1437,9 @@ function renderNakshatraTables(nData, tData) {
         }
     } else {
         for(let i=1; i<=12; i++) {
-            let cDeg = nData.cusps[i];
+            // Apply the Revert ASC shift offset here so ALL downstream placement logic updates!
+            let actualCuspIdx = ((i - 1 + houseNumberingOffset) % 12) + 1;
+            let cDeg = nData.cusps[actualCuspIdx];
             activeCusps[i] = cDeg;
             let signIdx = Math.floor(cDeg / 30);
             let nakIdx = Math.floor(cDeg / (360/27));
@@ -1668,11 +1891,12 @@ function render(){
             h.innerText="Transit Mixer";
             k.appendChild(h);
         }else{
-            let cuspHouseNum=((idx-pivotSign+12)%12)+1;
-            cuspHouseNum=((cuspHouseNum-houseStart+12)%12)+1;
-
+            // Shift the house numbering for the visual background
             let displayHouseNum=((idx - (pivotSign + houseNumberingOffset) + 12)%12)+1;
             displayHouseNum=((displayHouseNum-houseStart+12)%12)+1;
+
+            // Link the Cusp and ASC text markers to follow the shifted house
+            let cuspHouseNum = displayHouseNum;
 
             h.innerHTML+=`<div class="house-num">${displayHouseNum}</div>`;
             h.innerHTML+=`<div class="sav-box">${SAV[idx]}</div>`;
@@ -2028,25 +2252,46 @@ function renderBAVTable(nData){
     container.appendChild(table);
 }
 
-function renderAshtakavargaCharts(nData){
-    const container=document.getElementById("ashtakavargaContainer");
-    container.innerHTML="";
-    const planetsOrder=["SAV","Lagna","Saturn","Jupiter","Rahu","Mangala","Surya","Venus","Budha","Chandra"];
 
-    function makeKundali(values,title){
-        const k=document.createElement("div");
-        k.className="ashta-kundali";
-        const map=[11,0,1,2,10,-1,-1,3,9,-1,-1,4,8,7,6,5];
-        map.forEach(idx=>{
-            if(idx===-1){
-                const c=document.createElement("div");
-                c.className="ashta-center";
-                c.innerText=title;
+
+
+
+
+
+
+
+
+
+
+
+function renderAshtakavargaCharts(nData){
+    const container = document.getElementById("ashtakavargaContainer");
+    container.innerHTML = "";
+
+    // Added highlightIdx parameter to color the natal placement
+    function makeKundali(values, title, highlightIdx = -1){
+        const k = document.createElement("div");
+        k.className = "ashta-kundali";
+        const map = [11,0,1,2,10,-1,-1,3,9,-1,-1,4,8,7,6,5];
+        map.forEach(idx => {
+            if(idx === -1){
+                const c = document.createElement("div");
+                c.className = "ashta-center";
+                c.innerText = title;
                 k.appendChild(c);
-            }else{
-                const c=document.createElement("div");
-                c.className="ashta-cell";
-                c.innerText=values[idx]??"";
+            } else {
+                const c = document.createElement("div");
+                c.className = "ashta-cell";
+                c.innerText = values[idx] ?? "";
+                
+                // APPLY RED HIGHLIGHT FOR NATAL PLACEMENT
+                if(idx === highlightIdx) {
+                    c.style.background = "linear-gradient(135deg, #7f1d1d, #b30000)";
+                    c.style.color = "#ffcc00";
+                    c.style.boxShadow = "inset 0 0 10px rgba(0,0,0,0.8)";
+                    c.style.border = "1px solid #ffcc00";
+                }
+                
                 k.appendChild(c);
             }
         });
@@ -2056,33 +2301,78 @@ function renderAshtakavargaCharts(nData){
     const revertASC = document.getElementById("revertASC")?.checked;
     const pivot = document.getElementById("pivotSelect")?.value || "ASC";
     let pivotDeg = nData.lagna;
-    if(pivot==="ASC"){ pivotDeg = nData.lagna; }
-    else if(pivot.startsWith("C")){ const cNum=parseInt(pivot.substring(1)); pivotDeg=nData.cusps[cNum]; }
-    else if(nData.planets[pivot]!==undefined){ pivotDeg=nData.planets[pivot]; }
+    if(pivot === "ASC"){ pivotDeg = nData.lagna; }
+    else if(pivot.startsWith("C")){ const cNum = parseInt(pivot.substring(1)); pivotDeg = nData.cusps[cNum]; }
+    else if(nData.planets[pivot] !== undefined){ pivotDeg = nData.planets[pivot]; }
 
-    let SAV=calcSAV(nData,false);
-    if((pivotDeg % 30)>=15 && !revertASC){
-        const rotated=Array(12);
-        for(let i=0;i<12;i++){ rotated[(i+1)%12]=SAV[i]; }
-        SAV=rotated;
+    // Check if the chart is currently shifted/rotated
+    const shouldRotate = ((pivotDeg % 30) >= 15 && !revertASC);
+
+    // Helper to find the exact sign index for the red highlight
+    function getHighlightIndex(pName) {
+        let deg = (pName === "Lagna" || pName === "SAV") ? nData.lagna : nData.planets[pName];
+        if (deg === undefined) return -1;
+        
+        let sign = Math.floor(deg / 30);
+        // If the chart array rotated, we must rotate the visual highlight target to match
+        if (shouldRotate) {
+            sign = (sign + 1) % 12;
+        }
+        return sign;
     }
 
-    container.appendChild(makeKundali(SAV,"SAV"));
-
-    const grid=document.createElement("div");
-    grid.className="ashta-grid";
-
-    planetsOrder.slice(1).forEach(p=>{
-        let row=calcSingleBAV(nData,p);
-        if((pivotDeg % 30)>=15 && !revertASC){
-            const rotated=Array(12);
-            for(let i=0;i<12;i++){ rotated[(i+1)%12]=row[i]; }
-            row=rotated;
+    // Helper to calculate and rotate BAV values
+    function getBAV(pName) {
+        let row = calcSingleBAV(nData, pName);
+        if(shouldRotate){
+            const rotated = Array(12);
+            for(let i=0; i<12; i++){ rotated[(i+1)%12] = row[i]; }
+            row = rotated;
         }
-        grid.appendChild(makeKundali(row,"BAV "+p));
+        return row;
+    }
+
+    let SAV = calcSAV(nData, false);
+    if(shouldRotate){
+        const rotated = Array(12);
+        for(let i=0; i<12; i++){ rotated[(i+1)%12] = SAV[i]; }
+        SAV = rotated;
+    }
+
+    const rowStyle = "display:flex; flex-wrap:wrap; gap:30px; justify-content:space-between; width:100%; margin-bottom:40px;";
+
+    // ROW 1: SAV, Lagna (Highlighting Lagna placement for both)
+    const row1 = document.createElement("div");
+    row1.style.cssText = "display:flex; flex-wrap:wrap; gap:50px; justify-content:center; width:100%; margin-bottom:40px;";
+    row1.appendChild(makeKundali(SAV, "SAV", getHighlightIndex("SAV")));
+    row1.appendChild(makeKundali(getBAV("Lagna"), "BAV Lagna", getHighlightIndex("Lagna")));
+    container.appendChild(row1);
+
+    // ROW 2: Saturn, Jupiter, Rahu, Mangala
+    const row2 = document.createElement("div");
+    row2.style.cssText = rowStyle;
+    ["Saturn", "Jupiter", "Rahu", "Mangala"].forEach(p => {
+        row2.appendChild(makeKundali(getBAV(p), "BAV " + p, getHighlightIndex(p)));
     });
-    container.appendChild(grid);
+    container.appendChild(row2);
+
+    // ROW 3: Surya, Venus, Budha, Chandra
+    const row3 = document.createElement("div");
+    row3.style.cssText = rowStyle;
+    ["Surya", "Venus", "Budha", "Chandra"].forEach(p => {
+        row3.appendChild(makeKundali(getBAV(p), "BAV " + p, getHighlightIndex(p)));
+    });
+    container.appendChild(row3);
 }
+
+
+
+
+
+
+
+
+
 
 const WESTERN_ASPECTS = [
   { d:0,     o:8,   n:"Conjuct",  c:"aspect-white" },
