@@ -344,6 +344,14 @@ table td, table th{
     .btn-save-fetch { background: linear-gradient(135deg, #2563eb, #1e40af); color: #fff; border: 1px solid #1d4ed8; }
 </style>
 
+
+
+
+
+
+
+
+
 <div class="onlineFetchBox" style="border-color: #60a5fa;">
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(96,165,250,0.3); padding-bottom: 12px;">
         <div style="color: #60a5fa; font-size: 16px; font-weight: 900; letter-spacing: 1px;">&#x1F310; NATAL CLOUD FETCHER</div>
@@ -354,6 +362,7 @@ table td, table th{
     </div>
  
     <div class="fetch-row">
+        <!-- Date -->
         <div class="form-group">
             <span style="font-size: 13px; color:#bbb; font-weight: bold;">&#x1F4C5; Date (DD-MM-YYYY)</span>
             <div style="display:flex; gap:6px; align-items:center;">
@@ -363,6 +372,7 @@ table td, table th{
             </div>
         </div>
 
+        <!-- Time -->
         <div class="form-group">
             <span style="font-size: 13px; color:#bbb; font-weight: bold;">&#x23F1; Time (HH:MM:SS)</span>
             <div style="display:flex; gap:6px; align-items:center;">
@@ -372,20 +382,8 @@ table td, table th{
             </div>
         </div>
         
-        <div class="form-group">
-            <span style="font-size: 13px; color:#bbb; font-weight: bold;">&#x1F4CD; Standard Places</span>
-            <select id="locationPresetNatal" onchange="applyPresetLocation('Natal')" style="width: 200px;">
-                <option value="manual">Manual GPS (Default)</option>
-                <option value="13.3190737,77.1326306">Tumakuru</option>
-                <option value="12.918880,77.634986">Bengaluru</option>
-                <option value="13.315527,76.942059">Gubbi</option>
-                <option value="12.304776,76.655108">Mysore</option>
-            </select>
-        </div>
-    </div>
-    
-    <div class="fetch-row" style="margin-top: 5px;">
-        <div class="form-group" style="width: 100%;">
+        <!-- Coordinates -->
+        <div class="form-group" style="flex: 1;">
             <span style="font-size: 13px; color:#bbb; font-weight: bold;">&#x1F4CD; Coordinates: Latitude | Longitude | Lat (DMS) | Lon (DMS)</span>
             <div style="display:flex; gap:8px; align-items:center;">
                 <input type="text" id="onlineLat" value="13.340077" style="width: 100px; text-align:center;" oninput="syncCoords('dec', 'Natal')">
@@ -408,6 +406,19 @@ table td, table th{
                 <input type="text" id="dmsLonMin_Natal" value="06" style="width:45px; text-align:center;" oninput="syncCoords('dms', 'Natal')"><span style="color:#facc15;">'</span>
                 <input type="text" id="dmsLonSec_Natal" value="02" style="width:45px; text-align:center;" oninput="syncCoords('dms', 'Natal')"><span style="color:#facc15;">"</span>
             </div>
+        </div>
+    </div>
+    
+    <div class="fetch-row" style="margin-top: 5px;">
+        <div class="form-group">
+            <span style="font-size: 13px; color:#bbb; font-weight: bold;">&#x1F4CD; Standard Places</span>
+            <select id="locationPresetNatal" onchange="applyPresetLocation('Natal')" style="width: 200px;">
+                <option value="manual">Manual GPS (Default)</option>
+                <option value="13.3190737,77.1326306">Tumakuru</option>
+                <option value="12.918880,77.634986">Bengaluru</option>
+                <option value="13.315527,76.942059">Gubbi</option>
+                <option value="12.304776,76.655108">Mysore</option>
+            </select>
         </div>
     </div>
     
@@ -996,21 +1007,60 @@ function calculateAccurateOffset(tzString, d, m, y, hr, min) {
     } catch(e) { return 330; }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
 function saveCloudProfile(mode) {
     if(mode !== 'Natal') return; 
+    
+    // Ensure the chart data exists before saving
+    if(!natal) {
+        alert("No chart data available to save! Please fetch first.");
+        return;
+    }
+
+    // Automatically clean up unwanted ayanamshas to keep the file size lean
+    if (natal.ayanamshas) {
+        if (natal.ayanamshas["Sayana"]) delete natal.ayanamshas["Sayana"];
+        if (natal.ayanamshas["KP Old"]) delete natal.ayanamshas["KP Old"];
+    }
+
     const name = document.getElementById("onNameNatal").value.trim() || "Profile";
     const profileData = {
-        type: "CloudHoroscopeProfile", name: name,
+        type: "CloudHoroscopeProfile", 
+        name: name,
         date: { d: document.getElementById("onDay").value, m: document.getElementById("onMonth").value, y: document.getElementById("onYear").value },
         time: { h: document.getElementById("onHour").value, min: document.getElementById("onMin").value, sec: document.getElementById("onSec").value },
         coords: { lat: document.getElementById("onlineLat").value, lon: document.getElementById("onlineLon").value },
-        timezoneStr: timezoneStr['Natal']
+        timezoneStr: timezoneStr['Natal'],
+        chartData: natal // Embed the cleaned object directly for offline use
     };
+    
     const blob = new Blob([JSON.stringify(profileData, null, 2)], { type: "application/json" });
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+    const a = document.createElement("a"); 
+    a.href = URL.createObjectURL(blob);
     a.download = `${name.replace(/[^a-z0-9]/gi, '_').toUpperCase()}.json`;
     a.click();
 }
+
+
+
+
+
+
+
+
+
+
 
 function loadCloudProfile(event, mode) {
     const file = event.target.files[0]; if (!file) return;
@@ -1035,11 +1085,53 @@ function loadCloudProfile(event, mode) {
                 if (tzBadge) { tzBadge.innerText = timezoneStr[mode]; tzBadge.style.display = "inline-block"; }
             }
             syncCoords('dec', mode);
-            setTimeout(() => { fetchFromCloud(mode); }, 200);
-        } catch (err) { console.error("File error."); }
+
+            // Handle Offline vs Legacy Mode
+            if (data.chartData) {
+                // Offline Mode: Load data instantly
+                if (mode === 'Natal') {
+                    natal = data.chartData;
+                } else {
+                    transit = data.chartData;
+                }
+                
+                // Instantly update the UI without hitting the cloud API
+                render();
+                
+                // Provide visual feedback for offline load
+                const btn = document.getElementById(`fetchCloudBtn${mode}`);
+                if (btn) {
+                    const origBtnText = btn.innerHTML;
+                    btn.innerHTML = mode === 'Natal' ? "LOADED OFFLINE ✓" : "UPDATED OFFLINE ✓";
+                    if (mode === 'Natal') {
+                        btn.style.background = "#39ff14";
+                        btn.style.color = "#000";
+                    }
+                    setTimeout(() => { 
+                        btn.innerHTML = origBtnText; 
+                        btn.removeAttribute("style"); 
+                    }, 2000);
+                }
+            } else {
+                // Legacy Mode: Fall back to triggering the server fetch
+                setTimeout(() => { fetchFromCloud(mode); }, 200);
+            }
+        } catch (err) { console.error("File error loading profile."); }
     };
     reader.readAsText(file); event.target.value = '';
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Timer Logic for Wake Animation
 let serverTimers = { Natal: 0, Transit: 0 };
